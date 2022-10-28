@@ -1,8 +1,6 @@
 name: Update winget deps
 
-on:
-  push:
-
+on: [push, workflow_dispatch]
 
 jobs:
   update-winget:
@@ -12,5 +10,5 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Check for updates
-        uses: DeJayDev/dotfiles-action@v1
+        uses: DeJayDev/dotfiles-action@main
 
