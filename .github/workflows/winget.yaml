@@ -1,0 +1,16 @@
+name: Update winget deps
+
+on:
+  push:
+
+
+jobs:
+  update-winget:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check for updates
+        uses: DeJayDev/dotfiles-action@v1
+
