@@ -1,6 +1,6 @@
 name: Update winget deps
 
-on: [push, workflow_dispatch]
+on: [push, workflow_dispatch, repository_dispatch]
 
 jobs:
   update-winget:
