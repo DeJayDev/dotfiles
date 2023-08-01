@@ -1,2 +1,14 @@
+[user]
+	name = Dj Isaac
+	email = contact@dejaydev.com
+	signingkey = ~/.ssh/id_ed25519.pub
+[core]
+	editor = code --wait
 [init]
 	defaultBranch = main
+[pull]
+	rebase = true
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
