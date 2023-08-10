@@ -1,3 +1,6 @@
 [submodule "p10k"]
   path = .config/zsh/custom/themes/powerlevel10k
   url = git@github.com:romkatv/powerlevel10k.git
+[submodule ".config/zsh/custom/plugins/gradle-completion"]
+	path = .config/zsh/custom/plugins/gradle-completion
+	url = git@github.com:gradle/gradle-completion.git
