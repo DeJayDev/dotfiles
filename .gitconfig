@@ -8,7 +8,11 @@
 	defaultBranch = main
 [pull]
 	rebase = true
+[push]
+	autoSetupRemote = true
 [gpg]
 	format = ssh
 [commit]
 	gpgsign = true
+[safe]
+	directory = /opt/flutter
