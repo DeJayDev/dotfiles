@@ -3,3 +3,6 @@
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+if [ -f ~/.iterm2_shell_integration.zsh ]; then
+	source ~/.iterm2_shell_integration.zsh
+fi
