@@ -6,7 +6,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # If you come from bash you might have to change your $PATH.
-export PATH=$PATH:$HOME/bin:.local/bin:/usr/local/bin
+export PATH=$PATH:$HOME/bin:$HOME/.local/bin:/usr/local/bin
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -76,7 +76,7 @@ ZSH_CUSTOM=~/.config/zsh/custom
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git extract gradle-completion poetry)
+plugins=(git extract gradle-completion poetry autoswitch_virtualenv)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -106,13 +106,14 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-export PATH=$PATH:/home/dj/.spicetify
-
 export CHROME_EXECUTABLE=/usr/bin/microsoft-edge-dev
 
-# Load Custom Completions that aren't available as plugins
-fpath=($ZSH_CUSTOM/functions $fpath)
-autoload -Uz compinit
-compinit -u
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Spicetify
+export PATH=$PATH:$HOME/.spicetify
+
+# fnm
+export PATH=$PATH:$HOME/.local/share/fnm
+eval "$(fnm env --use-on-cd)"
