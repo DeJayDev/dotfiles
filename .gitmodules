@@ -5,5 +5,5 @@
   path = .config/zsh/custom/plugins/gradle-completion
   url = git@github.com:gradle/gradle-completion.git
 [submodule ".config/zsh/custom/plugins/autoswitch_virtualenv"]
-  path = .config/zsh/custom/plugins/autoswitch_virtualenv
-  url = git@github.com:MichaelAquilina/zsh-autoswitch-virtualenv.git
+	path = .config/zsh/custom/plugins/autoswitch_virtualenv
+	url = git@github.com:MichaelAquilina/zsh-autoswitch-virtualenv.git
