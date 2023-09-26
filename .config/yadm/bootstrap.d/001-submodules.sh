@@ -2,6 +2,8 @@
 
 cd "$HOME"
 
-echo "Init submodules"
-yadm submodule update --recursive --init
+echo "[.files] - Binding gitmodules to this installation"
+yadm gitconfig --global include.path ~/.
 
+echo "[.files] - Initializing submodules"
+yadm submodule update --recursive --init
