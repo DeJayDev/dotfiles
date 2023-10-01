@@ -1,9 +1,9 @@
 [submodule "p10k"]
   path = .config/zsh/custom/themes/powerlevel10k
   url = git@github.com:romkatv/powerlevel10k.git
-[submodule ".config/zsh/custom/plugins/gradle-completion"]
+[submodule "gradle-completion"]
   path = .config/zsh/custom/plugins/gradle-completion
   url = git@github.com:gradle/gradle-completion.git
-[submodule ".config/zsh/custom/plugins/autoswitch_virtualenv"]
-	path = .config/zsh/custom/plugins/autoswitch_virtualenv
-	url = git@github.com:MichaelAquilina/zsh-autoswitch-virtualenv.git
+[submodule "autoswitch_virtualenv"]
+  path = .config/zsh/custom/plugins/autoswitch_virtualenv
+  url = git@github.com:MichaelAquilina/zsh-autoswitch-virtualenv.git
