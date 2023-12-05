@@ -7,3 +7,8 @@ if [ -f ~/.iterm2_shell_integration.zsh ]; then
 	source ~/.iterm2_shell_integration.zsh
 	export AUTOSWITCH_DEFAULT_PYTHON="/opt/homebrew/bin/python3"
 fi
+
+
+# Added by Toolbox App
+export PATH="$PATH:/home/dj/.local/share/JetBrains/Toolbox/scripts"
+
