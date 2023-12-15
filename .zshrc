@@ -101,7 +101,7 @@ export PATH=$PATH:$HOME/.spicetify
 
 # fnm
 export PATH=$PATH:$HOME/.local/share/fnm
-eval "$(fnm env --use-on-cd)"
+eval "$(fnm env --use-on-cd --resolve-engines --corepack-enabled)"
 
 # Add custom completions
 fpath=($ZSH_CUSTOM/completions $fpath)
