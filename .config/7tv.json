@@ -1,74 +1,92 @@
 {
-  "timestamp": 1700618884004,
-  "settings": [
+  "timestamp":1708835287825,
+  "settings":[
     {
-      "key": "chat.mod_messages",
-      "type": "boolean",
-      "value": true,
-      "timestamp": 1700618585993
+      "key":"chat.mod_messages",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
     },
     {
-      "key": "chat_input.spam.bypass_duplicate",
-      "type": "boolean",
-      "value": true,
-      "timestamp": 1700618603818
+      "key":"chat.mod_logs.ack_risks",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
     },
     {
-      "key": "general.autoclaim.channel_points",
-      "type": "boolean",
-      "value": true,
-      "timestamp": 1700618577760
+      "key":"chat.mod_logs.enabled",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
     },
     {
-      "key": "highlights.basic.mention_sound",
-      "type": "boolean",
-      "value": true,
-      "timestamp": 1700618572411
+      "key":"chat_input.spam.bypass_duplicate",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
     },
     {
-      "key": "highlights.custom",
-      "type": "object",
-      "value": [
+      "key":"chat_input.autocomplete.colon.emoji",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
+    },
+    {
+      "key":"general.autoclaim.channel_points",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
+    },
+    {
+      "key":"highlights.basic.mention_sound",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
+    },
+    {
+      "key":"highlights.custom",
+      "type":"object",
+      "value":[
         [
           "56eadba2-5e3b-4bbd-af95-b730d6147ccb",
           {
-            "color": "#8803fc",
-            "label": "",
-            "pattern": "dejay",
-            "id": "56eadba2-5e3b-4bbd-af95-b730d6147ccb",
-            "persist": true
+            "color":"#8803fc",
+            "label":"",
+            "pattern":"dejay",
+            "id":"56eadba2-5e3b-4bbd-af95-b730d6147ccb",
+            "persist":true
           }
         ]
       ],
-      "timestamp": 1700618571126,
-      "constructorName": "Map"
+      "timestamp":1708835287825,
+      "constructorName":"Map"
     },
     {
-      "key": "player.skip_content_restriction",
-      "type": "boolean",
-      "value": true,
-      "timestamp": 1700618623214
+      "key":"player.skip_content_restriction",
+      "type":"boolean",
+      "value":true,
+      "timestamp":1708835287825
     },
     {
-      "key": "ui.compact_tooltips",
-      "type": "boolean",
-      "value": false,
-      "timestamp": 1700618873924
+      "key":"ui.compact_tooltips",
+      "type":"boolean",
+      "value":false,
+      "timestamp":1708835287825
     },
     {
-      "key": "ui.emote_menu.collapsed_sets",
-      "type": "object",
-      "value": [
+      "key":"ui.emote_menu.collapsed_sets",
+      "type":"object",
+      "value":[
         "personal-ad"
       ],
-      "timestamp": 1700618643580,
-      "constructorName": "Set"
+      "timestamp":1708835287825,
+      "constructorName":"Set"
     },
     {
-      "key": "ui.sidebar_previews",
-      "type": "boolean",
-      "value": false,
-      "timestamp": 1700618559784
+      "key":"ui.sidebar_previews",
+      "type":"boolean",
+      "value":false,
+      "timestamp":1708835287825
     }
   ]
 }
