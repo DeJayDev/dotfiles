@@ -91,10 +91,11 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-export CHROME_EXECUTABLE=/usr/bin/microsoft-edge-dev
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# lol
+export CHROME_EXECUTABLE=/usr/bin/microsoft-edge-dev
 
 # Spicetify
 export PATH=$PATH:$HOME/.spicetify
@@ -105,3 +106,4 @@ eval "$(fnm env --use-on-cd --resolve-engines --corepack-enabled)"
 
 # Add custom completions
 fpath=($ZSH_CUSTOM/completions $fpath)
+

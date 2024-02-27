@@ -1,1 +1,11 @@
 .wakatime.cfg
+.android/
+.cache/
+.cargo/
+.dartServer/
+.gradle/
+.local/
+.mozilla/
+.npm/
+.rustup/
+.var/
