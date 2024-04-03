@@ -107,3 +107,9 @@ eval "$(fnm env --use-on-cd --resolve-engines --corepack-enabled)"
 # Add custom completions
 fpath=($ZSH_CUSTOM/completions $fpath)
 
+# bun (im sorry)
+export BUN_INSTALL="$HOME/.bun"
+export PATH=$PATH:$BUN_INSTALL/bin
+
+# thefuck
+eval $(thefuck --alias)
