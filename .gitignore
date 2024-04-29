@@ -1,4 +1,4 @@
 .wakatime.cfg
 .*/
-!.local/share/yadm/
 !.config/
+
