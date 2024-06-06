@@ -16,3 +16,6 @@ export PATH="$PATH:/home/dj/.local/share/JetBrains/Toolbox/scripts"
 
 # thefuck
 eval "$(thefuck --alias)"
+
+# Added by OrbStack: command-line tools and integration
+source ~/.orbstack/shell/init.zsh 2>/dev/null || :

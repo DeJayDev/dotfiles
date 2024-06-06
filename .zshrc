@@ -113,3 +113,5 @@ export PATH=$PATH:$BUN_INSTALL/bin
 
 # thefuck
 eval $(thefuck --alias)
+
+source /Users/dj/.docker/init-zsh.sh || true # Added by Docker Desktop
