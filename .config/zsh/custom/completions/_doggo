@@ -1,0 +1,44 @@
+
+#compdef doggo
+
+_doggo() {
+  local -a commands
+  commands=(
+    'completions:Generate shell completion scripts'
+  )
+
+  _arguments -C \
+    '(-v --version)'{-v,--version}'[Show version of doggo]' \
+    '(-h --help)'{-h,--help}'[Show list of command-line options]' \
+    '(-q --query)'{-q,--query}'[Hostname to query the DNS records for]:hostname:_hosts' \
+    '(-t --type)'{-t,--type}'[Type of the DNS Record]:record type:(A AAAA CAA CNAME HINFO MX NS PTR SOA SRV TXT)' \
+    '(-n --nameserver)'{-n,--nameserver}'[Address of a specific nameserver to send queries to]:nameserver:_hosts' \
+    '(-c --class)'{-c,--class}'[Network class of the DNS record being queried]:network class:(IN CH HS)' \
+    '(-r --reverse)'{-r,--reverse}'[Performs a DNS Lookup for an IPv4 or IPv6 address]' \
+    '--strategy[Strategy to query nameserver listed in etc/resolv.conf]:strategy:(all random first)' \
+    '--ndots[Number of required dots in hostname to assume FQDN]:number of dots' \
+    '--search[Use the search list defined in resolv.conf]:setting:(true false)' \
+    '--timeout[Timeout (in seconds) for the resolver to return a response]:seconds' \
+    '(-4 --ipv4)'{-4,--ipv4}'[Use IPv4 only]' \
+    '(-6 --ipv6)'{-6,--ipv6}'[Use IPv6 only]' \
+    '--tls-hostname[Hostname used for verification of certificate incase the provided DoT nameserver is an IP]:hostname:_hosts' \
+    '--skip-hostname-verification[Skip TLS hostname verification in case of DoT lookups]' \
+    '(-J --json)'{-J,--json}'[Format the output as JSON]' \
+    '--short[Shows only the response section in the output]' \
+    '--color[Colored output]:setting:(true false)' \
+    '--debug[Enable debug logging]' \
+    '--time[Shows how long the response took from the server]' \
+    '*:hostname:_hosts' \
+    && ret=0
+
+  case $state in
+    (commands)
+      _describe -t commands 'doggo commands' commands && ret=0
+      ;;
+  esac
+
+  return ret
+}
+
+_doggo
+

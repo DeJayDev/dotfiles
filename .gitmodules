@@ -7,3 +7,6 @@
 [submodule "autoswitch_virtualenv"]
   path = .config/zsh/custom/plugins/autoswitch_virtualenv
   url = git@github.com:MichaelAquilina/zsh-autoswitch-virtualenv.git
+[submodule "zsh-autosuggestions"]
+  path = .config/zsh/custom/plugins/zsh-autosuggestions
+  url = git@github.com:zsh-users/zsh-autosuggestions.git
