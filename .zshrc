@@ -25,7 +25,15 @@ ZSH_CUSTOM=~/.config/zsh/custom
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git extract poetry gradle-completion autoswitch_virtualenv dotenv)
+plugins=(
+  autoswitch_virtualenv
+  dotenv
+  extract 
+  git 
+  gradle-completion
+  poetry 
+  zsh-autosuggestions
+)
 
 source $ZSH/oh-my-zsh.sh
 
