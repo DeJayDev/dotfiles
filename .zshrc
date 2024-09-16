@@ -71,6 +71,3 @@ fpath=($ZSH_CUSTOM/completions $fpath)
 # bun completions
 [ -s "/home/dj/.bun/_bun" ] && source "/home/dj/.bun/_bun"
 
-# atuin.sh
-. "$HOME/.atuin/bin/env"
-eval "$(atuin init zsh)"
