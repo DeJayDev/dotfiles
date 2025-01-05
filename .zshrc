@@ -71,3 +71,5 @@ fpath=($ZSH_CUSTOM/completions $fpath)
 # bun completions
 [ -s "/home/dj/.bun/_bun" ] && source "/home/dj/.bun/_bun"
 
+# zoxide
+eval "$(zoxide init zsh)"
