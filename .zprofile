@@ -2,7 +2,9 @@
 # But not PATH! 
 
 # Homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [ -f /opt/homebrew/bin/brew ]; then
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 # iTerm
 if [ -f ~/.iterm2_shell_integration.zsh ]; then
@@ -10,12 +12,7 @@ if [ -f ~/.iterm2_shell_integration.zsh ]; then
 	export AUTOSWITCH_DEFAULT_PYTHON="/opt/homebrew/bin/python3"
 fi
 
-# JetBrains Toolbox, comment courtesy of JetBrains.
-# Added by Toolbox App
-export PATH="$PATH:/home/dj/.local/share/JetBrains/Toolbox/scripts"
-
-# thefuck
-eval "$(thefuck --alias)"
-
-# Added by OrbStack: command-line tools and integration
-source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+# OrbStack: command-line tools and integration
+if [ -f ~/.orbstack/shell/init.zsh ]; then
+	source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+fi

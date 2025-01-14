@@ -51,25 +51,18 @@ source $ZSH/oh-my-zsh.sh
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# Add custom completions
+fpath=($ZSH_CUSTOM/completions $fpath)
+
 # lol
 export CHROME_EXECUTABLE=/usr/bin/microsoft-edge-dev
-
-# Spicetify
-export PATH=$PATH:$HOME/.spicetify
 
 # fnm
 export PATH=$PATH:$HOME/.local/share/fnm
 eval "$(fnm env --use-on-cd --resolve-engines --corepack-enabled)"
 
-# bun (im sorry)
-export BUN_INSTALL="$HOME/.bun"
-export PATH=$PATH:$BUN_INSTALL/bin
-
 # Add custom completions
 fpath=($ZSH_CUSTOM/completions $fpath)
-
-# bun completions
-[ -s "/home/dj/.bun/_bun" ] && source "/home/dj/.bun/_bun"
 
 # zoxide
 eval "$(zoxide init zsh)"
