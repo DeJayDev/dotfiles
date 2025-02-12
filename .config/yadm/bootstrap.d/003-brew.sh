@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -x "$(command -v brew)" ]; then
+if [[ "$(uname)" != "Darwin" ]] || [ -x "$(command -v brew)" ]; then
   exit 0
 fi
 

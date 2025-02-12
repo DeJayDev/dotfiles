@@ -1,7 +1,6 @@
 #!/bin/sh
 
 if [[ "$(uname)" != "Darwin" ]]; then
-  echo "[.files] - Not macOS, skipping macOS specific setup..."
   exit 0
 fi
 

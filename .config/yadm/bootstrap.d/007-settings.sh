@@ -2,6 +2,10 @@
 
 echo "[.files] Setting App Specific Preferences..."
 
+if [[ "$(uname)" != "Darwin" ]]; then
+  exit 0
+fi
+
 defaults write com.raycast.macos emojiPicker_skinTone medium
 # check if these are redundant:
 # defaults write com.raycast.macos raycastPreferredWindowMode compact
