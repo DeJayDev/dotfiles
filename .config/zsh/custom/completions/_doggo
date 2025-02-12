@@ -1,4 +1,3 @@
-
 #compdef doggo
 
 _doggo() {
@@ -28,6 +27,8 @@ _doggo() {
     '--color[Colored output]:setting:(true false)' \
     '--debug[Enable debug logging]' \
     '--time[Shows how long the response took from the server]' \
+    '--gp-from[Query using Globalping API from a specific location]' \
+    '--gp-limit[Limit the number of probes to use from Globalping]' \
     '*:hostname:_hosts' \
     && ret=0
 

@@ -1,3 +1,0 @@
-#!
-# teeldear
-# tokei
