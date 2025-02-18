@@ -1,2 +1,2 @@
-alias neofetch=hyfetch
+alias neofetch='fastfetch -c neofetch'
 
