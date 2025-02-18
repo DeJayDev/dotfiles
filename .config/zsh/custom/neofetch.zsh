@@ -1,0 +1,2 @@
+alias neofetch=hyfetch
+
