@@ -6,7 +6,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # If you come from bash you might have to change your $PATH.
-export PATH=$PATH:$HOME/bin:$HOME/.cargo/bin:$HOME/.local/bin:/usr/local/bin
+export PATH=$PATH:$HOME/bin:$HOME/.cargo/bin:$GOPATH/bin:$HOME/.local/bin:/usr/local/bin
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -57,3 +57,10 @@ fpath=($ZSH_CUSTOM/completions $fpath)
 
 # zoxide
 eval "$(zoxide init zsh)"
+
+# bun completions
+[ -s "/Users/dj/.bun/_bun" ] && source "/Users/dj/.bun/_bun"
+
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"
