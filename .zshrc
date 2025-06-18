@@ -27,7 +27,6 @@ ZSH_CUSTOM=~/.config/zsh/custom
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   autoswitch_virtualenv
-  dotenv
   extract 
   git 
   gradle-completion
@@ -64,3 +63,6 @@ eval "$(zoxide init zsh)"
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
+
+# mysql-client
+export PATH=$PATH:/opt/homebrew/opt/mysql-client/bin
