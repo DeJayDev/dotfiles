@@ -25,8 +25,10 @@ _envhire_get_file_mtime() {
 
 _envhire_parse_env_file() {
   local env_file="$1"
-  local -a env_vars=()
+  local -A env_vars=()
+  local -a var_order=()
   
+  # First pass: collect all variable assignments
   while IFS= read -r line; do
     [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
     
@@ -34,15 +36,80 @@ _envhire_parse_env_file() {
       local varname="$match[1]"
       local varvalue="$match[2]"
       
+      # Remove surrounding quotes if present
       if [[ "$varvalue" =~ ^[\"\'](.*)[\"\']$ ]]; then
         varvalue="$match[1]"
       fi
       
-      env_vars+=("$varname=$varvalue")
+      env_vars[$varname]="$varvalue"
+      var_order+=("$varname")
     fi
   done < "$env_file"
   
-  printf '%s\n' "${env_vars[@]}"
+  # Second pass: resolve variable references recursively
+  local -i max_iterations=10
+  local -i iteration=0
+  local changed=1
+  
+  while (( changed && iteration < max_iterations )); do
+    changed=0
+    iteration=$((iteration + 1))
+    
+    for varname in "${var_order[@]}"; do
+      local value="${env_vars[$varname]}"
+      local new_value="$value"
+      
+      # Keep expanding variables in this value until no more found
+      local keep_expanding=1
+      while (( keep_expanding )); do
+        keep_expanding=0
+        
+        # Check for ${VAR} format first
+        if [[ "$new_value" =~ \$\{([A-Za-z_][A-Za-z0-9_]*)\} ]]; then
+          local ref_var="$match[1]"
+          local ref_value=""
+          
+          # Check if referenced variable exists in our env_vars or current environment
+          if [[ -n "${env_vars[$ref_var]}" ]]; then
+            ref_value="${env_vars[$ref_var]}"
+          elif [[ -n "${(P)ref_var}" ]]; then
+            ref_value="${(P)ref_var}"
+          fi
+          
+          # Replace the variable reference with its value
+          new_value="${new_value/\$\{$ref_var\}/$ref_value}"
+          keep_expanding=1
+          
+        # Check for $VAR format
+        elif [[ "$new_value" =~ \$([A-Za-z_][A-Za-z0-9_]*) ]]; then
+          local ref_var="$match[1]"
+          local ref_value=""
+          
+          # Check if referenced variable exists in our env_vars or current environment  
+          if [[ -n "${env_vars[$ref_var]}" ]]; then
+            ref_value="${env_vars[$ref_var]}"
+          elif [[ -n "${(P)ref_var}" ]]; then
+            ref_value="${(P)ref_var}"
+          fi
+          
+          # Replace the variable reference with its value
+          new_value="${new_value/\$$ref_var/$ref_value}"
+          keep_expanding=1
+        fi
+      done
+      
+      # Update if value changed
+      if [[ "$new_value" != "$value" ]]; then
+        env_vars[$varname]="$new_value"
+        changed=1
+      fi
+    done
+  done
+  
+  # Output resolved variables in original order
+  for varname in "${var_order[@]}"; do
+    printf '%s=%s\n' "$varname" "${env_vars[$varname]}"
+  done
 }
 
 _envhire_source_env_file() {
