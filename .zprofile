@@ -19,3 +19,4 @@ if [ -f ~/.orbstack/shell/init.zsh ]; then
 fi
 
 export GOPATH=$HOME/.go
+export QT_BEARER_POLL_TIMEOUT=-1
