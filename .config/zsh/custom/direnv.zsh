@@ -9,9 +9,18 @@ _envhire_debug() {
   (( ENVHIRE_DEBUG )) && echo "envhire debug: $1" >&2
 }
 
+
+
 _envhire_get_file_mtime() {
   local file="$1"
-  [[ -f "$file" ]] && stat -f "%m" "$file" 2>/dev/null || echo "0"
+  if [[ -f "$file" ]]; then
+    case "$OSTYPE" in
+      darwin*) stat -f "%m" "$file" 2>/dev/null || echo "0" ;;
+      *) stat -c "%Y" "$file" 2>/dev/null || echo "0" ;;
+    esac
+  else
+    echo "0"
+  fi
 }
 
 _envhire_parse_env_file() {
@@ -19,8 +28,7 @@ _envhire_parse_env_file() {
   local -a env_vars=()
   
   while IFS= read -r line; do
-    [[ -z "$line" ]] && continue
-    [[ "$line" =~ ^[[:space:]]*# ]] && continue
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
     
     if [[ "$line" =~ ^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
       local varname="$match[1]"
@@ -46,7 +54,7 @@ _envhire_source_env_file() {
   local cached_mtime="${_ENVHIRE_FILE_MTIMES[$env_file]}"
   
   if [[ -n "$cached_mtime" && "$current_mtime" == "$cached_mtime" ]] && 
-     [[ " ${_ENVHIRE_LOADED_FILES[*]} " =~ " ${env_file} " ]]; then
+     (( ${_ENVHIRE_LOADED_FILES[(Ie)$env_file]} )); then
     _envhire_debug "Skipping unchanged file: $env_file"
     return 0
   fi
@@ -62,14 +70,23 @@ _envhire_source_env_file() {
     local varname="${assignment%%=*}"
     local varvalue="${assignment#*=}"
     
+    # Variable expansion using eval (safer than complex regex)
+    local expanded_value
+    if [[ "$varvalue" == *'$'* ]]; then
+      # Only use eval if there are dollar signs in the value
+      expanded_value=$(eval "echo \"$varvalue\"" 2>/dev/null) || expanded_value="$varvalue"
+    else
+      expanded_value="$varvalue"
+    fi
+    
     if [[ -z "${_ENVHIRE_ORIGINAL_VALUES[$varname]}" ]]; then
       _ENVHIRE_ORIGINAL_VALUES[$varname]="${(P)varname}"
       _envhire_debug "Storing original value for $varname: ${_ENVHIRE_ORIGINAL_VALUES[$varname]}"
     fi
     
-    export "$varname"="$varvalue"
+    export "$varname"="$expanded_value"
     modified_vars+=("$varname")
-    _envhire_debug "Set $varname = $varvalue"
+    _envhire_debug "Set $varname = $expanded_value (from: $varvalue)"
   done
   
   _ENVHIRE_FILE_VARS[$env_file]="${modified_vars[*]}"
@@ -127,11 +144,7 @@ _envhire_update_env() {
   
   local -a files_to_remove=()
   for loaded_file in "${_ENVHIRE_LOADED_FILES[@]}"; do
-    local found=0
-    for current_file in "${current_env_files[@]}"; do
-      [[ "$loaded_file" == "$current_file" ]] && { found=1; break; }
-    done
-    (( found )) || files_to_remove+=("$loaded_file")
+    (( ! ${current_env_files[(Ie)$loaded_file]} )) && files_to_remove+=("$loaded_file")
   done
     
   for file in "${files_to_remove[@]}"; do
@@ -139,19 +152,12 @@ _envhire_update_env() {
   done
   
   for env_file in "${current_env_files[@]}"; do
-    local already_loaded=0
-    for loaded_file in "${_ENVHIRE_LOADED_FILES[@]}"; do
-      [[ "$env_file" == "$loaded_file" ]] && { already_loaded=1; break; }
-    done
-    
-    if (( ! already_loaded )) || [[ -z "${_ENVHIRE_FILE_MTIMES[$env_file]}" ]]; then
+    if (( ! ${_ENVHIRE_LOADED_FILES[(Ie)$env_file]} )) || [[ -z "${_ENVHIRE_FILE_MTIMES[$env_file]}" ]]; then
       if _envhire_source_env_file "$env_file"; then
-        local found=0
-        for loaded_file in "${_ENVHIRE_LOADED_FILES[@]}"; do
-          [[ "$env_file" == "$loaded_file" ]] && { found=1; break; }
-        done
-        (( found )) || _ENVHIRE_LOADED_FILES+=("$env_file")
-        _envhire_debug "Added $env_file to loaded files"
+        (( ! ${_ENVHIRE_LOADED_FILES[(Ie)$env_file]} )) && {
+          _ENVHIRE_LOADED_FILES+=("$env_file")
+          _envhire_debug "Added $env_file to loaded files"
+        }
       fi
     fi
   done
@@ -167,7 +173,12 @@ envhire_status() {
       echo "  - $file"
       local vars="${_ENVHIRE_FILE_VARS[$file]}"
       local mtime="${_ENVHIRE_FILE_MTIMES[$file]}"
-      [[ -n "$mtime" ]] && echo "    Modified: $(date -r "$mtime" 2>/dev/null || echo "unknown")"
+      if [[ -n "$mtime" ]]; then
+        case "$OSTYPE" in
+          darwin*) echo "    Modified: $(date -r "$mtime" 2>/dev/null || echo "unknown")" ;;
+          *) echo "    Modified: $(date -d "@$mtime" 2>/dev/null || echo "unknown")" ;;
+        esac
+      fi
     done
   else
     echo "no files loaded"
@@ -204,6 +215,8 @@ envhire_debug() {
   
   echo "envhire debug: $([[ $ENVHIRE_DEBUG -eq 1 ]] && echo "on" || echo "off")"
 }
+
+
 
 autoload -Uz add-zsh-hook
 add-zsh-hook chpwd _envhire_update_env
