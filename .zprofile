@@ -20,3 +20,4 @@ fi
 
 export GOPATH=$HOME/.go
 export QT_BEARER_POLL_TIMEOUT=-1
+export AWS_PROFILE=dev-runpod

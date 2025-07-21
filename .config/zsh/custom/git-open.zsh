@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # thank you ben :)
 # https://github.com/Benricheson101/dots/blob/f87cfd8c2932bb16ea90cab71da4b5ceff815f47/scripts/git-open#L3
 
