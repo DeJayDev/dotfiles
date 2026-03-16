@@ -1,0 +1,13 @@
+{
+  "Profiles": [
+    {
+      "Name": "Default",
+      "Guid": "dotfiles-default-profile",
+      "Normal Font": "FiraCodeNF-Reg 13",
+      "Left Option Key Sends": 2,
+      "Right Option Key Sends": 0,
+      "Use Ligatures": true,
+      "Use Non-ASCII Font": false
+    }
+  ]
+}
