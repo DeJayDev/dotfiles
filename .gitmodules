@@ -10,3 +10,12 @@
 [submodule "zsh-autosuggestions"]
   path = .config/zsh/custom/plugins/zsh-autosuggestions
   url = git@github.com:zsh-users/zsh-autosuggestions.git
+[submodule ".skills/greptile"]
+	path = .skills/greptile
+	url = https://github.com/greptileai/skills.git
+[submodule ".claude/skills/greptile"]
+	path = .claude/skills/greptile
+	url = https://github.com/greptileai/skills.git
+[submodule ".claude/skills/.claude/skills/greptile"]
+	path = .claude/skills/.claude/skills/greptile
+	url = https://github.com/greptileai/skills.git
