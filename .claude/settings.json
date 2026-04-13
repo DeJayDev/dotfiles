@@ -1,0 +1,20 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.config/zsh/custom/claude-statusline"
+  },
+  "enabledPlugins": {},
+  "effortLevel": "medium",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -e '.prompt | test(\"^\\\\s*source\\\\s+\\\\S*venv\\\\S*/bin/activate\\\\s*$\")' >/dev/null && printf '%s' '{\"decision\":\"block\",\"reason\":\"ignored VS Code Python extension auto-activate injection\",\"suppressOutput\":true}' || true"
+          }
+        ]
+      }
+    ]
+  }
+}
