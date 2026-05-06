@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+
+input=$(cat)
+
+MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name')
+TOTAL_COST=$(echo "$input" | jq -r '.cost.total_cost_usd')
+
+TOTAL_COST=$(printf "%.2f" "$TOTAL_COST")
+LINES_ADDED=$(echo "$input" | jq -r '.cost.total_lines_added')
+LINES_REMOVED=$(echo "$input" | jq -r '.cost.total_lines_removed')
+lines_changed=$(echo "$input" | jq -r '.cost.total_lines_added + .cost.total_lines_removed')
+CTX_WINDOW_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size')
+
+FIVE_H=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+WEEK=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
+FIVE_H_RESETS=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
+WEEK_RESETS=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
+
+usage=$(echo "$input" | jq -r '.context_window.current_usage // empty')
+
+GREY='\033[90m'
+WHITE='\033[97m'
+GREEN='\033[32m'
+RED='\033[31m'
+YELLOW='\033[33m'
+NC='\033[0m' # No Color
+
+display="[$MODEL_DISPLAY]"
+
+if [ -n "$usage" ]; then
+        tokens=$(echo "$usage" | jq ".input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens")
+else
+        tokens=0
+fi
+pct=$((tokens * 100 / CTX_WINDOW_SIZE))
+
+if [ "$pct" -ge 90 ]; then
+        BAR_COLOR="$RED"
+elif [ "$pct" -ge 75 ]; then
+        BAR_COLOR="$YELLOW"
+else
+        BAR_COLOR="$GREEN"
+fi
+
+FILLED=$((pct / 10))
+EMPTY=$((10 - FILLED))
+FILL=$(printf "%${FILLED}s")
+PAD=$(printf "%${EMPTY}s")
+BAR="${FILL// /█}${PAD// /░}"
+
+display="${display} ${BAR_COLOR}${BAR}${NC} ${WHITE}$pct%${NC} ($tokens/$CTX_WINDOW_SIZE)\n${GREY}\$${TOTAL_COST}${NC}"
+
+if [ "$lines_changed" -gt 0 ]; then
+        display="${display} ${GREEN}+${LINES_ADDED}${NC} ${RED}-${LINES_REMOVED}${NC}"
+fi
+
+echo -e "$display${NC}"
+
+# Show 5 hour and weekly cost as a bar
+
+make_bar() {
+    local pct=$1
+    local resets_at=$2
+    local window_secs=$3
+    local filled=$((pct / 10))
+    local time_pos=""
+
+    if [ -n "$resets_at" ] && [ "$resets_at" != "null" ] && [ -n "$window_secs" ]; then
+        local now_ts elapsed_secs
+        now_ts=$(date +%s)
+        elapsed_secs=$((resets_at - now_ts))
+        time_pos=$(((window_secs - elapsed_secs) * 10 / window_secs))
+        [ "$time_pos" -lt 0 ] && time_pos=0
+        [ "$time_pos" -gt 9 ] && time_pos=9
+    fi
+
+    local bar=""
+    for i in $(seq 0 9); do
+        if [ -n "$time_pos" ] && [ "$i" -eq "$time_pos" ]; then
+            if [ "$i" -lt "$filled" ]; then
+                bar="${bar}${WHITE}█${GREY}"
+            else
+                bar="${bar}${WHITE}░${GREY}"
+            fi
+        elif [ "$i" -lt "$filled" ]; then
+            bar="${bar}█"
+        else
+            bar="${bar}░"
+        fi
+    done
+    echo -e "$bar"
+}
+
+if [ -n "$FIVE_H" ] && [ -n "$WEEK" ]; then
+        FIVE_H_BAR=$(make_bar "$FIVE_H" "$FIVE_H_RESETS" $((5 * 3600)))
+        WEEK_BAR=$(make_bar "$WEEK" "$WEEK_RESETS" $((7 * 24 * 3600)))
+        display="${GREY}5h: ${FIVE_H}% ${NC}${FIVE_H_BAR}${NC} | 7d: ${WEEK}% ${NC}${WEEK_BAR}${NC}"
+        echo -e "$display"
+fi
