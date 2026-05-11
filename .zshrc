@@ -32,6 +32,7 @@ plugins=(
   gradle-completion
   poetry 
   zsh-autosuggestions
+  aws
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -60,9 +61,13 @@ eval "$(zoxide init zsh)"
 # bun completions
 [ -s "/Users/dj/.bun/_bun" ] && source "/Users/dj/.bun/_bun"
 
+# pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
 
 # mysql-client
 export PATH=$PATH:/opt/homebrew/opt/mysql-client/bin
+
+# opencode
+export PATH=/Users/dj/.opencode/bin:$PATH

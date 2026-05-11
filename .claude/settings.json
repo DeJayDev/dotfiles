@@ -1,10 +1,4 @@
 {
-  "statusLine": {
-    "type": "command",
-    "command": "~/.config/zsh/custom/claude-statusline"
-  },
-  "enabledPlugins": {},
-  "effortLevel": "medium",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -15,6 +9,22 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"Check this edit against ~/.claude/CLAUDE.md.\"}}'"
+          }
+        ]
+      }
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.config/zsh/custom/claude-statusline"
+  },
+  "skipDangerousModePermissionPrompt": true,
 }

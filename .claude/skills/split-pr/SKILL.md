@@ -6,6 +6,7 @@ description: >
   (or branches if requested). Use when changes got mixed together and need untangling
   before a PR.
 allowed-tools: Bash(git:*)
+argument-hint: "[optional hint, e.g. \"split out the auth changes from the refactor\"]"
 ---
 
 # Split PR

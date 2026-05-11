@@ -1,5 +1,9 @@
 # Coding Rules
 
+## Safety
+
+- Never create or destroy resources without explicit permission. For example, git refs, PRs, uploads, infra. Ask first, every time.
+
 ## Style
 
 - Write code in my style, not external conventions. Clear, descriptive names. Readability over conciseness.
@@ -42,6 +46,16 @@
 - Be explicit when portability requires special casing (e.g., `date` vs. `gdate`).
 - No tests are required or expected. Default to the most common platform/environment for the language.
 
+## Tools
+
+- For ad-hoc CSV work in the shell, use `xan` (think "jq for CSVs"). Default output is plain CSV (agent-friendly, pipeable); reach for `xan view` / `xan flatten` only when showing data to the user. Use `xan to json` / `xan from json` for CSV⇄JSON conversion.
+  - xan gotchas:
+    - Comparisons use word operators: `eq ne gt ge lt le`. `==` is numeric-only; on strings it errors with "cannot safely cast Bytes(...)".
+    - `xan map 'EXPR as colname[, EXPR as colname]' file.csv` -- `as colname` is part of the expression string, not a flag.
+    - Substrings: `slice(s, start, end)` (no `left`/`right`/`substr`).
+    - `xan view` has no `-l/--limit`; cap rows upstream with `xan slice -l N`.
+    - Group-by-day pattern: `xan map 'slice(created_at, 0, 10) as day' | xan groupby day 'mean(x) as x, count() as n' | xan sort -s day`.
+
 ## Communication
 
 - We are on the same team. When unsure about something, just ask -- don't guess and waste tokens going down the wrong path.
@@ -49,4 +63,6 @@
 - Don't explore rabbit holes. If the first approach isn't working after a reasonable attempt, stop and ask for direction.
 - Call out unclear or contradictory instructions. Suggest a sensible default if ambiguity is low.
 - "ultrathink" means I'm frustrated with previous output quality. Be more careful and thorough.
+- Trust user-reported state (merge conflicts, CI failures, stale caches) at face value. Verify via git/gh/etc. -- don't dismiss as editor staleness.
+- When debugging, run the repo's standard build/typecheck/test command first. Let the tool output narrow the problem before deep-diving.
 
