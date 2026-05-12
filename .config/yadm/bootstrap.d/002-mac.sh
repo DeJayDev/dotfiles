@@ -13,6 +13,9 @@ defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
 # Smart Quotes in Messages
 defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
 
+# Show hidden files in Finder
+defaults write com.apple.finder AppleShowAllFiles -bool true
+
 #Enable Web Dev Tools in Safari (Useful!)
 defaults write com.apple.Safari IncludeDevelopMenu -bool true
 defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
