@@ -27,4 +27,5 @@
     "command": "~/.config/zsh/custom/claude-statusline"
   },
   "skipDangerousModePermissionPrompt": true,
+  "effortLevel": "medium"
 }
