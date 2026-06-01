@@ -71,3 +71,4 @@ export PATH=$PATH:/opt/homebrew/opt/mysql-client/bin
 
 # opencode
 export PATH=/Users/dj/.opencode/bin:$PATH
+

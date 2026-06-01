@@ -26,6 +26,19 @@
     "type": "command",
     "command": "~/.config/zsh/custom/claude-statusline"
   },
+  "enabledPlugins": {
+    "caveman@caveman": true,
+    "exa@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
-  "effortLevel": "medium"
+  "skipAutoPermissionPrompt": true
 }
