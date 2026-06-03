@@ -1,6 +1,0 @@
-2026-05-14 14:18:08,133 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
-2026-05-14 14:18:08,133 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
-2026-05-14 14:18:08,134 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
-2026-05-15 09:51:17,899 - mcp.server.lowlevel.server - INFO - Processing request of type ListToolsRequest
-2026-05-15 09:51:17,900 - mcp.server.lowlevel.server - INFO - Processing request of type ListPromptsRequest
-2026-05-15 09:51:17,900 - mcp.server.lowlevel.server - INFO - Processing request of type ListResourcesRequest
