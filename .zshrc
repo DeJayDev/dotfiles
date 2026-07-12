@@ -27,10 +27,10 @@ ZSH_CUSTOM=~/.config/zsh/custom
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   autoswitch_virtualenv
-  extract 
-  git 
+  extract
+  git
   gradle-completion
-  poetry 
+  poetry
   zsh-autosuggestions
   aws
 )
@@ -64,10 +64,16 @@ eval "$(zoxide init zsh)"
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
+command -v pyenv >/dev/null && eval "$(pyenv init - zsh)"
 
 # mysql-client
 export PATH=$PATH:/opt/homebrew/opt/mysql-client/bin
 
 # opencode
 export PATH=/Users/dj/.opencode/bin:$PATH
+
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<

@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Invoke Fable 5 via Claude Code CLI. Prompt from -f file or stdin.
+set -euo pipefail
+
+cwd=""
+prompt_file=""
+
+usage() {
+  echo "Usage: ask-fable.sh [-C dir] [-f promptfile]" >&2
+  echo "  Prompt from -f or stdin. Pins: --model fable --effort high --dangerously-skip-permissions -p" >&2
+  exit 2
+}
+
+while getopts "C:f:h" opt; do
+  case "$opt" in
+    C) cwd=$OPTARG ;;
+    f) prompt_file=$OPTARG ;;
+    h) usage ;;
+    *) usage ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if [[ $# -gt 0 ]]; then
+  echo "ask-fable.sh: unexpected arguments: $*" >&2
+  usage
+fi
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "ask-fable.sh: claude not found on PATH" >&2
+  exit 1
+fi
+
+tmp=""
+cleanup() {
+  if [[ -n "$tmp" && -f "$tmp" ]]; then
+    rm -f "$tmp"
+  fi
+}
+trap cleanup EXIT
+
+if [[ -n "$prompt_file" ]]; then
+  if [[ ! -f "$prompt_file" ]]; then
+    echo "ask-fable.sh: prompt file not found: $prompt_file" >&2
+    exit 1
+  fi
+  # Absolutize before any -C cd so relative -f still works
+  prompt_path=$(readlink -f "$prompt_file")
+else
+  if [[ -t 0 ]]; then
+    echo "ask-fable.sh: no -f and stdin is a TTY; pass -f or pipe a prompt" >&2
+    exit 1
+  fi
+  tmp=$(mktemp)
+  cat >"$tmp"
+  prompt_path=$tmp
+fi
+
+if [[ ! -s "$prompt_path" ]]; then
+  echo "ask-fable.sh: empty prompt" >&2
+  exit 1
+fi
+
+run_claude() {
+  # stdin form avoids ARG_MAX on large prompts; -p with redirected stdin works
+  claude \
+    --model fable \
+    --effort high \
+    --dangerously-skip-permissions \
+    -p <"$prompt_path"
+}
+
+if [[ -n "$cwd" ]]; then
+  if [[ ! -d "$cwd" ]]; then
+    echo "ask-fable.sh: -C directory not found: $cwd" >&2
+    exit 1
+  fi
+  (cd "$cwd" && run_claude)
+else
+  run_claude
+fi

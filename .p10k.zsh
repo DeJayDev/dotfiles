@@ -26,6 +26,9 @@
   # restarting zsh. Edit ~/.p10k.zsh and type `source ~/.p10k.zsh`.
   unset -m '(POWERLEVEL9K_*|DEFAULT_USER)~POWERLEVEL9K_GITSTATUS_DIR'
 
+  # Disable gitstatus: distutils missing on this machine (Python 3.12+), daemon can't provision.
+  typeset -g POWERLEVEL9K_DISABLE_GITSTATUS=true
+
   # Zsh >= 5.1 is required.
   [[ $ZSH_VERSION == (5.<1->*|<6->.*) ]] || return
 

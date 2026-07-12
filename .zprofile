@@ -20,4 +20,9 @@ fi
 
 export GOPATH=$HOME/.go
 export QT_BEARER_POLL_TIMEOUT=-1
-export AWS_PROFILE=dev-runpod
+export AWS_PROFILE=staging
+
+if [[ -n "$WSL_DISTRO_NAME" ]]; then
+  # Skip compaudit security scan of completion dirs (slow on WSL 9p filesystem).
+  export ZSH_DISABLE_COMPFIX="true"
+fi

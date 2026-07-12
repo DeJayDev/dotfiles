@@ -1,4 +1,5 @@
 .wakatime.cfg
 .*/
 !.config/
-
+!.claude/skills
+!.agent/skills
