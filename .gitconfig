@@ -23,6 +23,6 @@
 	process = git-lfs filter-process
 	required = true
 [gpg "ssh"]
-	allowedSignersFile = /home/dj/.ssh/allowed_signers
+	allowedSignersFile = ~/.ssh/allowed_signers
 [http]
 	postBuffer = 1048576000

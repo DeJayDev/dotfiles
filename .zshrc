@@ -52,14 +52,8 @@ export CHROME_EXECUTABLE=/usr/bin/microsoft-edge-dev
 export PATH=$PATH:$HOME/.local/share/fnm
 eval "$(fnm env --use-on-cd --resolve-engines --corepack-enabled)"
 
-# Add custom completions
-fpath=($ZSH_CUSTOM/completions $fpath)
-
 # zoxide
 eval "$(zoxide init zsh)"
-
-# bun completions
-[ -s "/Users/dj/.bun/_bun" ] && source "/Users/dj/.bun/_bun"
 
 # pyenv
 export PYENV_ROOT="$HOME/.pyenv"
