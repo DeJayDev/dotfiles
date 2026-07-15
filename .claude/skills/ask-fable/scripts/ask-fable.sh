@@ -61,6 +61,16 @@ if [[ ! -s "$prompt_path" ]]; then
   exit 1
 fi
 
+# Fable is a fresh one-shot subprocess: it cannot see the caller's conversation,
+# so prompts that reference it are broken by construction. High-precision phrases only.
+referents='as (mentioned|discussed|noted) (above|earlier)|see above|as we discussed|we (just |already )?(discussed|talked about|looked at)|continue where you left off|per (our|this) conversation|in (this|our) (conversation|thread|session)|the (file|code|error|function) (above|we were)'
+if match=$(grep -inE "$referents" "$prompt_path" | head -3); then
+  echo "ask-fable.sh: prompt references a conversation Fable cannot see:" >&2
+  echo "$match" >&2
+  echo "Fable is a one-shot subprocess with no shared context. Rewrite the prompt to be self-contained: inline the facts these phrases point at." >&2
+  exit 1
+fi
+
 run_claude() {
   # stdin form avoids ARG_MAX on large prompts; -p with redirected stdin works
   claude \
