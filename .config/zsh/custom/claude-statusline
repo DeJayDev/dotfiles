@@ -23,6 +23,7 @@ WHITE='\033[97m'
 GREEN='\033[32m'
 RED='\033[31m'
 YELLOW='\033[33m'
+BLUE='\033[94m'
 NC='\033[0m' # No Color
 
 display="[$MODEL_DISPLAY]"
@@ -32,7 +33,11 @@ if [ -n "$usage" ]; then
 else
         tokens=0
 fi
-pct=$((tokens * 100 / CTX_WINDOW_SIZE))
+if [[ "$CTX_WINDOW_SIZE" =~ ^[0-9]+$ ]] && [ "$CTX_WINDOW_SIZE" -gt 0 ]; then
+        pct=$((tokens * 100 / CTX_WINDOW_SIZE))
+else
+        pct=0
+fi
 
 if [ "$pct" -ge 90 ]; then
         BAR_COLOR="$RED"
@@ -44,11 +49,11 @@ fi
 
 FILLED=$((pct / 10))
 EMPTY=$((10 - FILLED))
-FILL=$(printf "%${FILLED}s")
-PAD=$(printf "%${EMPTY}s")
+printf -v FILL "%${FILLED}s"
+printf -v PAD "%${EMPTY}s"
 BAR="${FILL// /█}${PAD// /░}"
 
-display="${display} ${BAR_COLOR}${BAR}${NC} ${WHITE}$pct%${NC} ($tokens/$CTX_WINDOW_SIZE)\n${GREY}\$${TOTAL_COST}${NC}"
+display="${display} ${BAR_COLOR}${BAR}${NC} ${WHITE}${pct%.*}%${NC} ($tokens/$CTX_WINDOW_SIZE)\n${GREY}\$${TOTAL_COST}${NC}"
 
 if [ "$lines_changed" -gt 0 ]; then
         display="${display} ${GREEN}+${LINES_ADDED}${NC} ${RED}-${LINES_REMOVED}${NC}"
@@ -59,41 +64,81 @@ echo -e "$display${NC}"
 # Show 5 hour and weekly cost as a bar
 
 make_bar() {
-    local pct=$1
-    local resets_at=$2
-    local window_secs=$3
-    local filled=$((pct / 10))
-    local time_pos=""
+        local pct=$1
+        local resets_at=$2
+        local window_secs=$3
+        local filled=$((pct / 10))
+        local time_pos=""
 
-    if [ -n "$resets_at" ] && [ "$resets_at" != "null" ] && [ -n "$window_secs" ]; then
-        local now_ts elapsed_secs
-        now_ts=$(date +%s)
-        elapsed_secs=$((resets_at - now_ts))
-        time_pos=$(((window_secs - elapsed_secs) * 10 / window_secs))
-        [ "$time_pos" -lt 0 ] && time_pos=0
-        [ "$time_pos" -gt 9 ] && time_pos=9
-    fi
-
-    local bar=""
-    for i in $(seq 0 9); do
-        if [ -n "$time_pos" ] && [ "$i" -eq "$time_pos" ]; then
-            if [ "$i" -lt "$filled" ]; then
-                bar="${bar}${WHITE}█${GREY}"
-            else
-                bar="${bar}${WHITE}░${GREY}"
-            fi
-        elif [ "$i" -lt "$filled" ]; then
-            bar="${bar}█"
-        else
-            bar="${bar}░"
+        if [ -n "$resets_at" ] && [ "$resets_at" != "null" ] && [ -n "$window_secs" ]; then
+                local now_ts elapsed_secs
+                now_ts=$(date +%s)
+                elapsed_secs=$((resets_at - now_ts))
+                time_pos=$(((window_secs - elapsed_secs) * 10 / window_secs))
+                [ "$time_pos" -lt 0 ] && time_pos=0
+                [ "$time_pos" -gt 9 ] && time_pos=9
         fi
-    done
-    echo -e "$bar"
+
+        local bar=""
+        for i in $(seq 0 9); do
+                if [ -n "$time_pos" ] && [ "$i" -eq "$time_pos" ]; then
+                        if [ "$i" -lt "$filled" ]; then
+                                bar="${bar}${WHITE}█${GREY}"
+                        else
+                                bar="${bar}${WHITE}░${GREY}"
+                        fi
+                elif [ "$i" -lt "$filled" ]; then
+                        bar="${bar}█"
+                else
+                        bar="${bar}░"
+                fi
+        done
+        echo -e "$bar"
 }
 
-if [ -n "$FIVE_H" ] && [ -n "$WEEK" ]; then
+format_reset() {
+        local resets_at=$1
+        if [ -z "$resets_at" ] || [ "$resets_at" = "null" ]; then
+                echo ""
+                return
+        fi
+        local now_ts remaining days hours mins
+        now_ts=$(date +%s)
+        remaining=$((resets_at - now_ts))
+        [ "$remaining" -lt 0 ] && remaining=0
+        days=$((remaining / 86400))
+        hours=$(((remaining % 86400) / 3600))
+        mins=$(((remaining % 3600) / 60))
+        if [ "$days" -gt 0 ]; then
+                echo "${days}d${hours}h"
+        elif [ "$hours" -gt 0 ]; then
+                echo "${hours}h${mins}m"
+        else
+                echo "${mins}m"
+        fi
+}
+
+FIVE_H_SEG=""
+WEEK_SEG=""
+
+if [ -n "$FIVE_H" ]; then
         FIVE_H_BAR=$(make_bar "$FIVE_H" "$FIVE_H_RESETS" $((5 * 3600)))
+        FIVE_H_RESET=$(format_reset "$FIVE_H_RESETS")
+        FIVE_H_SEG="${GREY}5h: ${FIVE_H%.*}% ${NC}${FIVE_H_BAR}${NC}"
+        [ -n "$FIVE_H_RESET" ] && FIVE_H_SEG="${FIVE_H_SEG}${GREY} (${BLUE}${FIVE_H_RESET}${NC}${GREY})${NC}"
+fi
+
+if [ -n "$WEEK" ]; then
         WEEK_BAR=$(make_bar "$WEEK" "$WEEK_RESETS" $((7 * 24 * 3600)))
-        display="${GREY}5h: ${FIVE_H}% ${NC}${FIVE_H_BAR}${NC} | 7d: ${WEEK}% ${NC}${WEEK_BAR}${NC}"
-        echo -e "$display"
+        WEEK_RESET=$(format_reset "$WEEK_RESETS")
+        WEEK_SEG="${GREY}7d: ${WEEK%.*}% ${NC}${WEEK_BAR}${NC}"
+        [ -n "$WEEK_RESET" ] && WEEK_SEG="${WEEK_SEG}${GREY} (${BLUE}${WEEK_RESET}${NC}${GREY})${NC}"
+fi
+
+if [ -n "$FIVE_H_SEG" ] && [ -n "$WEEK_SEG" ]; then
+        echo -e "${FIVE_H_SEG} | ${WEEK_SEG}"
+elif [ -n "$FIVE_H_SEG" ]; then
+        echo -e "$FIVE_H_SEG"
+elif [ -n "$WEEK_SEG" ]; then
+        echo -e "$WEEK_SEG"
 fi
