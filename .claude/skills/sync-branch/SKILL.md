@@ -40,15 +40,25 @@ git status --porcelain
 
 ### 2. Resolve the base branch
 
-If $ARGUMENTS provides a base, use it. Otherwise detect:
+Branch topology is a fact to read, not assume. Stacked branches and retargeted PRs mean the repo default is often the wrong base.
+
+If $ARGUMENTS provides a base, use it. Otherwise detect in this order:
+
+1. **PR base (preferred when a PR exists):**
+
+```bash
+gh pr view --json baseRefName -q .baseRefName
+```
+
+2. **Remote default HEAD** if there is no PR or `gh` fails:
 
 ```bash
 git remote show origin | grep 'HEAD branch' | awk '{print $NF}'
 ```
 
-Fall back to `main` if that fails.
+3. Fall back to `main` if that fails.
 
-Confirm the ref actually exists before relying on it (`git rev-parse --verify origin/<base>`). A base that is a release branch rather than the repo default is a strong hint to pay close attention to step 4e.
+Confirm the ref actually exists before relying on it (`git rev-parse --verify origin/<base>`). A base that is a release branch rather than the repo default is a strong hint to pay close attention to step 4e. Tell the user which source you used for the base (PR / remote HEAD / fallback / $ARGUMENTS).
 
 ### 3. Fetch and report the gap
 

@@ -4,17 +4,20 @@ set -euo pipefail
 
 cwd=""
 prompt_file=""
+read_only=""
 
 usage() {
-  echo "Usage: ask-fable.sh [-C dir] [-f promptfile]" >&2
-  echo "  Prompt from -f or stdin. Pins: --model fable --effort high --dangerously-skip-permissions -p" >&2
+  echo "Usage: ask-fable.sh [-C dir] [-f promptfile] [-r]" >&2
+  echo "  Prompt from -f or stdin. Pins: --model claude-fable-5 --effort high --dangerously-skip-permissions -p" >&2
+  echo "  -r  read-only: restrict Fable to Read/Glob/Grep/WebFetch/WebSearch (no Bash, no edits)" >&2
   exit 2
 }
 
-while getopts "C:f:h" opt; do
+while getopts "C:f:rh" opt; do
   case "$opt" in
     C) cwd=$OPTARG ;;
     f) prompt_file=$OPTARG ;;
+    r) read_only=1 ;;
     h) usage ;;
     *) usage ;;
   esac
@@ -72,11 +75,16 @@ if match=$(grep -inE "$referents" "$prompt_path" | head -3); then
 fi
 
 run_claude() {
+  local tools="default"
+  if [[ -n "$read_only" ]]; then
+    tools="Read,Glob,Grep,WebFetch,WebSearch"
+  fi
   # stdin form avoids ARG_MAX on large prompts; -p with redirected stdin works
   claude \
-    --model fable \
+    --model claude-opus-4-8 \
     --effort high \
     --dangerously-skip-permissions \
+    --tools "$tools" \
     -p <"$prompt_path"
 }
 

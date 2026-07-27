@@ -64,6 +64,10 @@ rm -f "$P"
 
 stdin works too. Prefer a temp file over fragile quoting for long prompts.
 
+Add `-r` for a read-only Fable (analysis, review, second opinion): tools are
+limited to Read/Glob/Grep/WebFetch/WebSearch -- no Bash, no edits, nothing to
+check afterward. Omit `-r` when you want Fable to implement.
+
 Raw CLI if the helper is missing (no referent check on this path -- you are
 the check):
 
