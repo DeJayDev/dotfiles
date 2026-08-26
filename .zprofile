@@ -21,6 +21,7 @@ fi
 export GOPATH=$HOME/.go
 export QT_BEARER_POLL_TIMEOUT=-1
 export AWS_PROFILE=staging
+export INFISICAL_DOMAIN="https://app.infisical.com"
 
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
   # Skip compaudit security scan of completion dirs (slow on WSL 9p filesystem).
