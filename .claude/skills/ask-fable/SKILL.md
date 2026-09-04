@@ -1,7 +1,7 @@
 ---
 name: ask-fable
 description: >
-  Consult Fable 5 (Claude Code CLI) for hard questions, second opinions, stuck
+  Consult Fable (Claude Code CLI) for hard questions, second opinions, stuck
   situations, and optional implementation. Stateless one-shot: each call spawns
   a fresh subprocess that sees only the prompt text -- never this conversation,
   never prior calls. No follow-ups exist. Use when the user says /ask-fable,
@@ -23,11 +23,6 @@ know it.
 - Hard / non-trivial questions, stuck after failures, second opinions
 - Explicit user request for Fable
 - Not for trivial lookups the host can answer alone
-
-## Self-call guard
-
-If the host is already Fable 5: answer in-process unless the user explicitly
-wants a fresh/isolated Fable session (`--force`, "fresh Fable", etc.).
 
 ## Compose the prompt
 

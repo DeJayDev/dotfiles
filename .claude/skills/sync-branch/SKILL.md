@@ -71,8 +71,6 @@ Tell the user how many commits behind and ahead they are. If behind is 0, stop �
 
 ### 4. Reconnaissance — understand both sides BEFORE touching anything
 
-This step is the difference between a careful sync and a sloppy one. Skip nothing here.
-
 **4a. What's coming in from base?** List the incoming commits and skim their messages and shape:
 
 ```bash
@@ -115,7 +113,7 @@ git diff --name-status --find-renames origin/<base>...HEAD | grep '^R'
 
 Cross-reference renames with the conflict-candidate list and flag any pairs to the user before continuing.
 
-**4e. Is the branch dragging along commits the base doesn't have?** This decides step 5, and it is the step people skip.
+**4e. Is the branch dragging along commits the base doesn't have?** This decides step 5.
 
 ```bash
 git log --format='%h %an | %s' origin/<base>..HEAD   # who authored what's "yours"
@@ -211,7 +209,7 @@ Work through every conflicted file:
 git diff --name-only --diff-filter=U
 ```
 
-For each conflicted file, follow this loop. **Do not skip the 3-way read.**
+For each conflicted file, follow this loop.
 
 **8a. Read all three versions from the index.** The working tree only shows ours-vs-theirs; the merge base is what tells you *who changed what*:
 
@@ -325,4 +323,3 @@ Branch rewritten on top of <base>. Old tip was <sha> (still on the remote until 
 - A merge commit is authored by the user performing the merge, but every other commit keeps its original author — no one else's work gets attributed to the user. That cuts both ways: foreign commits stay visibly foreign in `git log`, which is exactly what makes step 4e work.
 - If the repo requires linear history (no merge commits), the replay path is the only option — say so rather than proposing a merge.
 - For generated files, regenerate; don't hand-merge.
-- The reconnaissance in step 4 is not optional. Skipping it is what "sloppy" means in this context.

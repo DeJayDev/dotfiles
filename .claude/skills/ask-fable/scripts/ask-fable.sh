@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Invoke Fable 5 via Claude Code CLI. Prompt from -f file or stdin.
+# Invoke Fable via Claude Code CLI. Prompt from -f file or stdin.
 set -euo pipefail
 
 cwd=""
@@ -8,7 +8,7 @@ read_only=""
 
 usage() {
   echo "Usage: ask-fable.sh [-C dir] [-f promptfile] [-r]" >&2
-  echo "  Prompt from -f or stdin. Pins: --model claude-fable-5 --effort high --dangerously-skip-permissions -p" >&2
+  echo "  Prompt from -f or stdin. Pins: --model fable --effort high --dangerously-skip-permissions -p" >&2
   echo "  -r  read-only: restrict Fable to Read/Glob/Grep/WebFetch/WebSearch (no Bash, no edits)" >&2
   exit 2
 }
@@ -81,7 +81,7 @@ run_claude() {
   fi
   # stdin form avoids ARG_MAX on large prompts; -p with redirected stdin works
   claude \
-    --model claude-opus-4-8 \
+    --model fable \
     --effort high \
     --dangerously-skip-permissions \
     --tools "$tools" \

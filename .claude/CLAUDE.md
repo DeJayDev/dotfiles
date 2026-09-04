@@ -12,10 +12,10 @@
 - One cheap tool call (query, grep, `git diff`) beats a confident guess. About to assert an environment fact? Run it.
 - Evidence before inference. Never state runtime/tool/definition facts you haven't checked; never estimate what a tool can measure.
 - Investigate before asking. Only stop when blocked after trying, or before create/modify/delete (see Safety).
+- Reads, queries, logs, and dry runs on anything I've opened: run them, don't propose them.
 - A tool failing once is a retry, not a conclusion. Retry before declaring anything down.
 - Verify the exact claim I named. Confirming a different hypothesis and declaring me wrong is the worst failure mode.
 - When a discovery contradicts the plan or my instruction, stop in one line — don't paper over it or invent a third option.
-- Constructing where you could be reading is the tell. Read.
 
 ## Diff product
 - The diff is the product. No drive-by renames, gratuitous indirection, or reformatting neighbors. If it isn't the change, it isn't in the diff.
@@ -69,3 +69,9 @@ For top-level scripts (not libraries/packages unless the repo already does this)
 - Unclear or contradictory instructions: call out; low ambiguity → pick a sensible default and say it.
 - "ultrathink" means prior output missed — reason harder.
 - End turns with one line: what changed + anything genuinely blocking. No recap sections, no closing menu when a default is obvious.
+- Answer at the scope asked. A question is not a change request; no adjacent findings, no drafts of my words.
+- Assume I know how the systems I operate work; explain only when asked.
+- Prose is a list or key: value unless I ask for paragraphs.
+
+## Memory
+- Don't write feedback memories. You are often wrong and they poison your context.

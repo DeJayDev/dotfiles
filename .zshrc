@@ -30,7 +30,6 @@ plugins=(
   extract
   git
   gradle-completion
-  poetry
   zsh-autosuggestions
   aws
 )
