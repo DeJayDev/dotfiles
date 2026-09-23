@@ -44,12 +44,8 @@ source $ZSH/oh-my-zsh.sh
 # Add custom completions
 fpath=($ZSH_CUSTOM/completions $fpath)
 
-# lol
-export CHROME_EXECUTABLE=/usr/bin/microsoft-edge-dev
-
-# fnm
-export PATH=$PATH:$HOME/.local/share/fnm
-eval "$(fnm env --use-on-cd --resolve-engines --corepack-enabled)"
+# mise
+eval "$(mise activate zsh)"
 
 # zoxide
 eval "$(zoxide init zsh)"
@@ -70,3 +66,11 @@ export PATH="$HOME/.grok/bin:$PATH"
 fpath=(~/.grok/completions/zsh $fpath)
 autoload -Uz compinit && compinit -C
 # <<< grok installer <<<
+
+# pnpm
+export PNPM_HOME='/Users/dj/Library/pnpm'
+case ":$PATH:" in
+  *":$PNPM_HOME/bin:"*) ;;
+  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
+esac
+# pnpm end
