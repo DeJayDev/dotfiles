@@ -1,12 +1,6 @@
 ---
 name: ask-fable
-description: >
-  Consult Fable (Claude Code CLI) for hard questions, second opinions, stuck
-  situations, and optional implementation. Stateless one-shot: each call spawns
-  a fresh subprocess that sees only the prompt text -- never this conversation,
-  never prior calls. No follow-ups exist. Use when the user says /ask-fable,
-  "ask Fable", "consult Fable", "second opinion from Fable", or when a hard
-  judgment call or failed approaches warrant escalating to Fable.
+description: "Hand a hard question to Fable in a one-shot `claude -p` subprocess that sees only the prompt you write: no conversation, no follow-ups. Read-only for second opinions, write mode for implementation. Use when the user asks for Fable, or after repeated failed attempts on a hard bug or judgment call."
 compatibility: Requires `claude` CLI on PATH with Fable model access
 ---
 

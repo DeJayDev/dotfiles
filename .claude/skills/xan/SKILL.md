@@ -1,6 +1,6 @@
 ---
 name: xan
-description: Ad-hoc CSV work in the shell with `xan` ("jq for CSVs"). Use when reading, filtering, aggregating, sorting, joining, or converting CSV/TSV/NDJSON files from the command line, or when the user mentions xan.
+description: "Ad-hoc CSV, TSV, and NDJSON work in the shell with `xan`: filter, aggregate, sort, join, convert. Use instead of awk or a Python script for one-off tabular data, or when the user mentions xan."
 ---
 
 Default output is plain CSV (agent-friendly, pipeable); reach for `xan view` / `xan flatten` only when showing data to the user. Use `xan to json` / `xan from json` for CSV<->JSON conversion.

@@ -1,7 +1,6 @@
 ---
 name: vault
-description: NVIDIA on-prem secrets. Where a token lives, the command to read or rotate it, whether it is expired. Hands you the command, never runs it.
-disable-model-invocation: true
+description: "NVIDIA on-prem secrets: where each one lives (Vault, k8s secrets, the DB), the command to read, patch, or check its expiry. Hands the user the command, never runs it and never prints values. Use for any NVIDIA token, password, or secret question: NVBugs, P4, GitLab PAT, Redis, Hatchet, MCP."
 argument-hint: "[which secret, or the question: 'nvbugs token', 'is the gitlab pat expired', 'redis password']"
 ---
 

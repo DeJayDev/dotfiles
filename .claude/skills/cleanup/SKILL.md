@@ -1,7 +1,6 @@
 ---
 name: cleanup
-description: Big cleanup pass on a file or folder, together. Loads Ponytail, dedupes, deletes dead code, de-weirds patterns.
-disable-model-invocation: true
+description: "Maintainability sweep of a file or folder the user names: dedupe helpers across the repo, delete dead code, inline thin wrappers, replace one-off patterns with repo idioms. Edits the working tree, never commits. Use when the user asks to clean up, deslop, or dedupe existing code. Use instead of simplify and code-review."
 argument-hint: "[file or folder, in plain words]"
 ---
 

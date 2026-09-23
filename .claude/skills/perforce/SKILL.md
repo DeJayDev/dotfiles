@@ -1,13 +1,6 @@
 ---
 name: perforce
-description: >
-  Use when working with Perforce / P4 (the version control system formerly called
-  Helix Core) or its code review tool P4 Code Review (formerly Helix Swarm).
-  Triggers on: p4, perforce, helix core, helix swarm, swarm, "p4 code review",
-  depot, changelist / CL, workspace / client, shelve, p4 submit, p4 edit, p4 sync,
-  streams, .p4config, P4PORT, a review URL like swarm/12345, or porting a git
-  mental model to perforce. Covers the core CLI, the centralized mental model that
-  trips up git users, and the shelve -> #review -> approve code review lifecycle.
+description: "Perforce (P4, formerly Helix Core) and P4 Code Review (formerly Swarm): the p4 CLI, open-before-edit, changelists, shelving, the #review lifecycle, and git-to-p4 translation. Use for any p4 command, depot, changelist, shelve, workspace/client, .p4config, P4PORT, or swarm/NNNN URL, and before applying git habits to a P4 workspace."
 ---
 
 # Perforce (P4) and P4 Code Review

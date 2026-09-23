@@ -1,10 +1,6 @@
 ---
 name: split-pr
-description: >
-  Splits a messy working tree or staging area into clean, focused commits or branches.
-  Analyzes changed files, groups them by logical concern, and creates separate commits
-  (or branches if requested). Use when changes got mixed together and need untangling
-  before a PR.
+description: "Split a mixed working tree or staging area into focused commits, or branches on request, grouped by concern. Shows the grouping and waits for the user's confirmation before committing. Use when the user wants mixed changes untangled before a PR."
 allowed-tools: Bash(git:*)
 argument-hint: "[optional hint, e.g. \"split out the auth changes from the refactor\"]"
 ---

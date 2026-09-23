@@ -1,11 +1,10 @@
 ---
-name: tighten
-description: Rewrite a PR body, reviewer reply, README, postmortem, or email into dj's voice. Short, bold-lead bullets, links over stories.
-disable-model-invocation: true
+name: asme
+description: "Rewrite outward-facing prose into the user's voice: PR bodies, reviewer replies, READMEs, docs, postmortems, emails. Word budgets, bold-lead bullets, evidence links, no LLM filler. Use when the user asks to tighten, shorten, or rewrite text, and before you draft a PR body or reviewer reply for them."
 argument-hint: "[what to tighten: pasted text, a file path, or 'the PR body']"
 ---
 
-# Tighten
+# asme
 
 Target, as the user typed it: **$ARGUMENTS**
 

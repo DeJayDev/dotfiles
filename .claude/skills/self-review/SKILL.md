@@ -1,7 +1,6 @@
 ---
 name: self-review
-description: Invoke-only. /cleanup scoped to the files you just wrote, plus an adversarial bug hunt. Applies the fixes.
-disable-model-invocation: true
+description: "Hostile review of what you wrote or changed in this conversation: puts each line on trial, hunts common self-authored bug classes, reverts churn, then applies the fixes under cleanup's rules. Use when the user asks you to review, check, or double-check your own work. Use instead of simplify and code-review."
 ---
 
 # Self-review
@@ -37,7 +36,7 @@ Read the current bytes, not your memory of writing them.
 - "your changes to <file>" -> `git diff -- <file>` plus a full `Read` of the file
   so you judge the change in context, not in isolation.
 - a named thing ("the pollers", "discover-apps.sh") with no diff framing ->
-  `Glob`/`Grep` to locate every file it spans, `Read` them fully, and say which
+  `fd`/`rg` to locate every file it spans, `Read` them fully, and say which
   files you're putting on trial so the user can correct the set before you spend
   the effort.
 

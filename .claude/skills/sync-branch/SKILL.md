@@ -1,13 +1,7 @@
 ---
 name: sync-branch
-description: >
-  Brings the current branch up to date with its base, either by merging the base in or by
-  replaying your commits on top of it. Does reconnaissance first (what's coming in, what's
-  likely to conflict, whether the branch is dragging along commits the base doesn't want),
-  then resolves every conflict with proper 3-way context. Stops before pushing. Use when a
-  feature branch is behind main/master/a release branch and needs to be caught up,
-  especially before opening or updating a PR.
-allowed-tools: Bash(git:*), Bash(gh:*), Bash(bun:*), Bash(pnpm:*), Bash(npm:*), Bash(yarn:*), Read, Edit, Grep, Glob
+description: "Catch the current branch up with its real base (PR base first, then remote HEAD): scout both sides, choose merge or replay, resolve conflicts by intent with 3-way context, run checks. Stops before pushing. Use when a branch is behind main, master, or a release branch."
+allowed-tools: Bash(git:*), Bash(gh:*), Bash(bun:*), Bash(pnpm:*), Bash(npm:*), Bash(yarn:*), Read, Edit
 ---
 
 # Sync Branch

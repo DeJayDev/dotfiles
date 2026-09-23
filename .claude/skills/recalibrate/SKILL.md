@@ -1,7 +1,7 @@
 ---
 name: recalibrate
 argument-hint: [instructions]
-description: Re-align with the user after a context compact. Verify nothing important was lost and confirm the next step before resuming work. Does not write a spec or plan file.
+description: "After a context compact, state what you believe about the task, then confirm the state and next step with AskUserQuestion before resuming. Writes no spec or plan file. Use when the user says recalibrate or asks whether anything was lost in the compact."
 ---
 
 Use this skill to recover alignment after the conversation was compacted. The goal is to confirm shared context and agree on the next concrete step — not to produce a spec, plan, or file.

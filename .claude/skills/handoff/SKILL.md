@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Compact the current conversation into a handoff document for another agent to pick up.
+description: "Write a handoff doc to a temp file so a fresh agent can continue: state, decisions, next steps, suggested skills, and links to existing artifacts instead of copies. Use when the user asks for a handoff or wants to continue the work in another session."
 argument-hint: "What will the next session be used for?"
 ---
 
