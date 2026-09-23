@@ -22,6 +22,13 @@ export GOPATH=$HOME/.go
 export QT_BEARER_POLL_TIMEOUT=-1
 export AWS_PROFILE=staging
 export INFISICAL_DOMAIN="https://app.infisical.com"
+export PYENV_ROOT="$HOME/.pyenv"
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  export PNPM_HOME="$HOME/Library/pnpm"
+else
+  export PNPM_HOME="$HOME/.local/share/pnpm"
+fi
 
 if [[ -n "$WSL_DISTRO_NAME" ]]; then
   # Skip compaudit security scan of completion dirs (slow on WSL 9p filesystem).

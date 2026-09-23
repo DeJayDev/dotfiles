@@ -51,7 +51,6 @@ eval "$(mise activate zsh)"
 eval "$(zoxide init zsh)"
 
 # pyenv
-export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 command -v pyenv >/dev/null && eval "$(pyenv init - zsh)"
 
@@ -59,7 +58,7 @@ command -v pyenv >/dev/null && eval "$(pyenv init - zsh)"
 export PATH=$PATH:/opt/homebrew/opt/mysql-client/bin
 
 # opencode
-export PATH=/Users/dj/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH
 
 # >>> grok installer >>>
 export PATH="$HOME/.grok/bin:$PATH"
@@ -68,9 +67,11 @@ autoload -Uz compinit && compinit -C
 # <<< grok installer <<<
 
 # pnpm
-export PNPM_HOME='/Users/dj/Library/pnpm'
 case ":$PATH:" in
   *":$PNPM_HOME/bin:"*) ;;
   *) export PATH="$PNPM_HOME/bin:$PATH" ;;
 esac
 # pnpm end
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
