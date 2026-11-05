@@ -1,5 +1,6 @@
 backup_badge() {
         local target=$1 success=$2 result=$3 check_result=$4
+        [ -n "$result" ] || return
         local age=$((EPOCHSECONDS - success))
         if [ "$result" = "fail" ] || [ "$check_result" = "fail" ] || [ "$age" -gt $((26 * 3600)) ]; then
                 echo "${RED}bk ${target} fail${NC}"

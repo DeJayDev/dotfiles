@@ -1,6 +1,6 @@
 # claude-backup
 
-Backs up Claude Code transcripts (`~/.claude/projects/` and `history.jsonl`) with restic to two repos: `~/syncthing/claude-backup`, which Syncthing carries to every host and to ava, and the R2 bucket `claude-backups`. SessionStart and SessionEnd hooks run it when a repo's last success is over 12h old, and launchd (macOS) or a systemd user timer (Linux) runs it every 12h regardless. Snapshots are never pruned.
+Backs up Claude Code transcripts (`~/.claude/projects/` and `history.jsonl`) with restic to the R2 bucket `claude-backups`, and also to a local repo at `~/.local/share/claude-backup` when one exists there. SessionStart and SessionEnd hooks run it when a repo's last success is over 12h old, and launchd (macOS) or a systemd user timer (Linux) runs it every 12h regardless. Snapshots are never pruned.
 
 The restic password and R2 token live in `secrets.age` next to this file, encrypted to a key held by this machine's Secure Enclave or TPM (`~/.local/state/claude-backup/hw-identity.txt`). Their plaintext, `secrets.env`, only exists inside the yadm archive, so the yadm passphrase is the root of everything. The archive itself is encrypted with age's passphrase mode through `~/.local/bin/yadm-age`, which refuses any yadm call it doesn't recognize. The log and the status file behind the statusline badge are in `~/.local/state/claude-backup/`.
 
@@ -19,7 +19,7 @@ The source is `main.go` next to this file. The bootstrap builds it into `~/.loca
 1. `yadm clone`, run the bootstrap, then `yadm decrypt`. The post_decrypt hook binds the secrets to this machine's chip.
 2. Load the secrets, then `restic -r "$r2" snapshots --host <old-host>`.
 3. `restic -r "$r2" restore latest --host <old-host> --target ~/claude-restore`. Snapshots keep absolute paths, so move `projects/` and `history.jsonl` from `~/claude-restore/<old home>/.claude/` into `~/.claude`.
-4. If R2 is unreachable, copy `/srv/backup/claude-backup` from ava (or `~/syncthing/claude-backup` from any host) and run the same commands with `-r` pointing at the copy.
+4. If R2 is unreachable, run the same commands with `-r` pointing at a local repo or any copy of one.
 
 ## Restore one session the cleanup deleted
 
@@ -42,5 +42,6 @@ Yellow `bk <repo> 14h` means that repo's last success is over 13h old. Red `bk <
 
 1. Create the R2 bucket `claude-backups` and an API token scoped to Object Read & Write on that bucket only.
 2. With `umask 077`, write `~/.config/claude-backup/secrets.env` as four `export` lines: `RESTIC_PASSWORD` (from `openssl rand -base64 32`), `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and `R2_ACCOUNT_ID`.
-3. `yadm encrypt` binds them to the chip; commit the archive. Load the secrets, then `restic init -r "$r2"` and `RESTIC_FROM_PASSWORD="$RESTIC_PASSWORD" restic init -r ~/syncthing/claude-backup --from-repo "$r2" --copy-chunker-params` so both repos chunk identically.
-4. Other hosts don't initialize anything. They receive the local repo through Syncthing and back up under their own `--host`.
+3. `yadm encrypt` binds them to the chip; commit the archive. Load the secrets, then `restic init -r "$r2"`.
+4. Optionally, add a local repo with `RESTIC_FROM_PASSWORD="$RESTIC_PASSWORD" restic init -r ~/.local/share/claude-backup --from-repo "$r2" --copy-chunker-params`, so it chunks identically to R2. claude-backup uses it from then on.
+5. Other machines don't initialize anything. They back up to the same R2 repo under their own `--host`.

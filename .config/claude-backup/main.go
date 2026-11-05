@@ -22,7 +22,7 @@ var (
 	home, _     = os.UserHomeDir()
 	claudeDir   = cmp.Or(os.Getenv("CLAUDE_CONFIG_DIR"), filepath.Join(home, ".claude"))
 	stateDir    = filepath.Join(cmp.Or(os.Getenv("XDG_STATE_HOME"), filepath.Join(home, ".local/state")), "claude-backup")
-	localRepo   = filepath.Join(home, "syncthing/claude-backup")
+	localRepo   = filepath.Join(cmp.Or(os.Getenv("XDG_DATA_HOME"), filepath.Join(home, ".local/share")), "claude-backup")
 	identity    = filepath.Join(stateDir, "hw-identity.txt")
 	secretsFile = filepath.Join(home, ".config/claude-backup/secrets.age")
 	statusFile  = filepath.Join(stateDir, "status")
@@ -30,7 +30,16 @@ var (
 
 	logFile *os.File
 	logger  *log.Logger
+
+	statusDefaults = map[string]string{"success_": "0", "result_": "none", "check_": "0", "check_result_": "none"}
 )
+
+type repo struct {
+	name       string
+	url        string
+	checkEvery time.Duration
+	checkArgs  []string
+}
 
 func main() {
 	os.Exit(run())
@@ -62,13 +71,21 @@ func run() int {
 		return 0
 	}
 	must(err)
-	status := readStatus()
+
+	r2 := &repo{name: "r2", checkEvery: 30 * 24 * time.Hour, checkArgs: []string{"--read-data-subset=5%"}}
+	repos := []*repo{r2}
+	if _, err := os.Stat(filepath.Join(localRepo, "config")); err == nil {
+		repos = []*repo{{name: "local", url: localRepo, checkEvery: 7 * 24 * time.Hour}, r2}
+	}
+
+	status := readStatus(repos)
 	defer func() {
 		writeStatus(status)
 		os.Remove(lockDir)
 	}()
 
-	if since(status, "success_local") < minAge && since(status, "success_r2") < minAge {
+	stale := slices.ContainsFunc(repos, func(repo *repo) bool { return since(status, "success_"+repo.name) >= minAge })
+	if !stale {
 		return 0
 	}
 
@@ -78,10 +95,12 @@ func run() int {
 	secrets, err := loadSecrets(ctx)
 	if err != nil {
 		logger.Printf("secrets: %v", err)
-		status["result_local"] = "fail"
-		status["result_r2"] = "fail"
+		for _, repo := range repos {
+			status["result_"+repo.name] = "fail"
+		}
 		return 1
 	}
+	r2.url = "s3:https://" + secrets["R2_ACCOUNT_ID"] + ".r2.cloudflarestorage.com/claude-backups"
 	env := append(os.Environ(), "AWS_DEFAULT_REGION=auto")
 	for key, value := range secrets {
 		env = append(env, key+"="+value)
@@ -91,16 +110,6 @@ func run() int {
 	must(err)
 	host, _, _ := strings.Cut(hostname, ".")
 	now := strconv.FormatInt(time.Now().Unix(), 10)
-
-	repos := []struct {
-		name       string
-		url        string
-		checkEvery time.Duration
-		checkArgs  []string
-	}{
-		{"local", localRepo, 7 * 24 * time.Hour, nil},
-		{"r2", "s3:https://" + secrets["R2_ACCOUNT_ID"] + ".r2.cloudflarestorage.com/claude-backups", 30 * 24 * time.Hour, []string{"--read-data-subset=5%"}},
-	}
 
 	failed := false
 	for _, repo := range repos {
@@ -186,27 +195,28 @@ func restic(ctx context.Context, env []string, args ...string) error {
 	cmd := exec.CommandContext(ctx, "restic", args...)
 	cmd.Env = env
 	cmd.Stderr = logFile
-	// SIGINT instead of SIGKILL so restic removes its lock from the shared repo.
+	// SIGINT instead of SIGKILL so restic removes its lock from the repo.
 	cmd.Cancel = func() error { return cmd.Process.Signal(os.Interrupt) }
 	cmd.WaitDelay = 30 * time.Second
 	return cmd.Run()
 }
 
-func readStatus() map[string]string {
-	status := map[string]string{
-		"success_local": "0", "success_r2": "0",
-		"result_local": "none", "result_r2": "none",
-		"check_local": "0", "check_r2": "0",
-		"check_result_local": "none", "check_result_r2": "none",
-	}
+func readStatus(repos []*repo) map[string]string {
+	saved := map[string]string{}
 	data, err := os.ReadFile(statusFile)
-	if errors.Is(err, os.ErrNotExist) {
-		return status
+	if !errors.Is(err, os.ErrNotExist) {
+		must(err)
+		for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
+			if key, value, found := strings.Cut(line, "="); found {
+				saved[key] = value
+			}
+		}
 	}
-	must(err)
-	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
-		if key, value, found := strings.Cut(line, "="); found {
-			status[key] = value
+
+	status := map[string]string{}
+	for _, repo := range repos {
+		for prefix, fallback := range statusDefaults {
+			status[prefix+repo.name] = cmp.Or(saved[prefix+repo.name], fallback)
 		}
 	}
 	return status
