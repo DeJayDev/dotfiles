@@ -20,6 +20,26 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "nohup claude-backup --if-older 12h >/dev/null 2>&1 &"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "nohup claude-backup --if-older 12h >/dev/null 2>&1 &"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

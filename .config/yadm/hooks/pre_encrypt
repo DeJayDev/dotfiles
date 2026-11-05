@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+identity="${XDG_STATE_HOME:-$HOME/.local/state}/claude-backup/hw-identity.txt"
+secrets_env="$HOME/.config/claude-backup/secrets.env"
+secrets_age="$HOME/.config/claude-backup/secrets.age"
+
+if [[ -f "$secrets_env" ]]; then
+  exit 0
+fi
+
+if [[ ! -f "$secrets_age" ]]; then
+  echo "claude-backup: neither $secrets_env nor $secrets_age exists, refusing to write an archive without the backup secrets" >&2
+  exit 1
+fi
+
+umask 077
+age -d -i "$identity" -o "$secrets_env" "$secrets_age"

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/claude-backup"
+identity="$state_dir/hw-identity.txt"
+secrets_env="$HOME/.config/claude-backup/secrets.env"
+secrets_age="$HOME/.config/claude-backup/secrets.age"
+
+if [[ ! -f "$secrets_env" ]]; then
+  exit 0
+fi
+
+mkdir -p "$state_dir"
+umask 077
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  if [[ ! -f "$identity" ]]; then
+    age-plugin-se keygen --access-control none -o "$identity"
+  fi
+  recipient=$(age-plugin-se recipients -i "$identity")
+else
+  if [[ ! -e /dev/tpmrm0 ]]; then
+    echo "claude-backup: no TPM at /dev/tpmrm0, this host can't hold the hardware-bound key; leaving $secrets_env in place" >&2
+    exit 1
+  fi
+  if [[ ! -f "$identity" ]]; then
+    age-plugin-tpm --generate -o "$identity"
+  fi
+  recipient=$(age-plugin-tpm -y "$identity")
+fi
+
+age -r "$recipient" -o "$secrets_age" "$secrets_env"
+rm "$secrets_env"
