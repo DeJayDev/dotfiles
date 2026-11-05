@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${1:-}" == "-d" && $# -eq 2 ]]; then
+  exec age -d "$2"
+fi
+if [[ $# -eq 4 && "$1" == "--yes" && "$2" == "-c" && "$3" == "--output" ]]; then
+  exec age -p -o "$4"
+fi
+echo "yadm-age: unsupported arguments from yadm: $*" >&2
+exit 2
