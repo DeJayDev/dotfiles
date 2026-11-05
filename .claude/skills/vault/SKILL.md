@@ -10,9 +10,10 @@ Asked: **$ARGUMENTS**
 
 ## Mode
 
-- You hand over the command; the user runs it. Claude never runs anything
-  against the cluster, the jump host, or Vault. "No dude, I need you to give
-  ME the query."
+- For secret values you hand over the command; the user runs it. Claude never
+  reads a secret value from the cluster, the node, or Vault. "No dude, I need
+  you to give ME the query." Non-secret reads (key names, which secret feeds an
+  env var, Vault metadata) follow ~/nvidia/CLAUDE.md, and Claude runs them.
 - Short commands. No 400-character pipelines; the terminal wraps and the shell
   splits them. Two or three lines, or a script file, never one long one.
 - No secret VALUE ever lands in this transcript. Read into a shell variable
@@ -39,7 +40,7 @@ next worker roll.
 Coordinates come from the pod, not memory:
 
 ```
-kubectl exec deploy/greptile-worker -- printenv | grep -E '^VAULT_(ADDR|NAMESPACE|KV_MOUNT|SECRET_PATH)='
+kubectl exec -n greptile deploy/greptile-worker -c worker -- printenv | grep -E '^VAULT_(ADDR|NAMESPACE|KV_MOUNT|SECRET_PATH)='
 ```
 
 Values seen 2026-08, so you know what to expect: `VAULT_ADDR=https://prod.vault.nvidia.com`,
@@ -48,14 +49,15 @@ Values seen 2026-08, so you know what to expect: `VAULT_ADDR=https://prod.vault.
 
 The CLI is `~/nvidia/vault` (NVault Client 2.4.x, not on PATH). Two
 namespaces: login happens in `it-eis` (Microsoft SSO), the kv lives in
-`ipp-aicode-greptile`. `~/nvidia/.env` sets `VAULT_ADDR` and
-`VAULT_NAMESPACE=it-eis` and the shell auto-loads it there, so kv commands
-pass `-namespace=ipp-aicode-greptile` inline rather than exporting over it.
+`ipp-aicode-greptile`. `~/nvidia/.env` (auto-loaded) sets `VAULT_ADDR` and
+`VAULT_NAMESPACE=ipp-aicode-greptile` (checked 2026-10-28), so kv commands
+work as is; the inline `-namespace=ipp-aicode-greptile` below is redundant but
+harmless. Login is the one that needs `it-eis` inline.
 
 Login. Omitting `-path` 404s with `invalid mount path`:
 
 ```
-cd ~/nvidia && ./vault login -method=oidc -path=oidc-admins role=namespace-admin
+cd ~/nvidia && ./vault login -namespace=it-eis -method=oidc -path=oidc-admins role=namespace-admin
 ```
 
 Read a key. The path form works on this binary and on the older jump-host
@@ -81,29 +83,29 @@ read -s P4SW
 ~/nvidia/vault kv patch -namespace=ipp-aicode-greptile kv/aicode/greptilia P4PASSWD_SW="$P4SW"
 ```
 
-Local files: `~/nvidia/vault` (the CLI), `~/nvidia/.env` (`VAULT_ADDR`,
-`VAULT_NAMESPACE`, `KUBECONFIG`, `PGPASSWORD`), `~/nvidia/p4-login`
-(`--instance p4proxy-sc:4106 --p4user svcgreptile`). `~/nvidia/scripts/` is
-empty.
+Local files:
+- `~/nvidia/vault`: the CLI.
+- `~/nvidia/.env`: `VAULT_ADDR`, `VAULT_NAMESPACE`, `KUBECONFIG`, `PGPASSWORD`, `TOKEN_ENCRYPTION_KEY`, `NVBUGS_TOKEN`, `GITLAB_TOKEN`, `GITLAB_TOKEN_ME`.
+- `~/nvidia/p4-login`: the user renews svcgreptile tickets with `--instance p4proxy-sc:<port> --p4user svcgreptile`. Ports are p4hw 4101, p4sw 4106, p4mis 2003, p4pgi 2034. Never `p4 login`.
 
 ## Kubernetes secrets
 
 ```
-kubectl get secret greptile-secrets -o jsonpath='{.data.REDIS_PASSWORD}' | base64 -d
-kubectl get secret hatchet-client-config -o jsonpath='{.data.HATCHET_CLIENT_TOKEN}' | base64 -d
+kubectl get secret -n greptile greptile-secrets -o jsonpath='{.data.REDIS_PASSWORD}' | base64 -d
+kubectl get secret -n greptile hatchet-client-config -o jsonpath='{.data.HATCHET_CLIENT_TOKEN}' | base64 -d
 ```
 
 Also in `greptile-secrets`: `JACKSON_API_KEYS` (comma list, `| cut -d, -f1`),
 `WEBHOOK_SECRET`, `DATABASE_URL`. Key names only:
 
 ```
-kubectl get secret greptile-secrets -o go-template='{{range $k,$v := .data}}{{$k}}{{"\n"}}{{end}}'
+kubectl get secret -n greptile greptile-secrets -o go-template='{{range $k,$v := .data}}{{$k}}{{"\n"}}{{end}}'
 ```
 
 Which secret feeds an env var:
 
 ```
-kubectl get deploy greptile-worker -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="REDIS_HOST")].valueFrom.secretKeyRef.name}'
+kubectl get deploy -n greptile greptile-worker -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="REDIS_HOST")].valueFrom.secretKeyRef.name}'
 ```
 
 ## GitLab PAT
@@ -114,7 +116,7 @@ on the pod; the plaintext shows only in the user's terminal:
 
 ```
 read -s KEY
-kubectl exec -i greptile-postgresql-0 -c postgresql -- env PGPASSWORD=postgres psql -U postgres -d postgres -At -c "
+kubectl exec -i -n greptile greptile-postgresql-0 -c postgresql -- env PGPASSWORD="$PGPASSWORD" psql -U readonly -d postgres -At -c "
   select c.id, i.url, c.bot_username, pgp_sym_decrypt(c.access_token_encrypted, '$KEY')
   from \"ScmConnection\" c join \"ScmInstance\" i on i.id = c.scm_instance_id
   where i.type = 'GITLAB' and c.access_token_encrypted is not null"

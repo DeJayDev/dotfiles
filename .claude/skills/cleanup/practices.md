@@ -23,6 +23,8 @@ just wrote).
   contract. `delete()` may archive under the hood when that is the correct
   platform semantics; it is still the interface method.
 - **Misplaced types.** Types that belong in the types file go back to it.
+- **Tests of internals.** Apply the rule in
+  `~/.claude/skills/test-sweep/SKILL.md` to the target's tests.
 - **Comments and logs.** Rewrite unclear comments. Fix wrong or misleading
   logger calls (level, message, stale context); fixing is not removing.
 

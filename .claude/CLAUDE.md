@@ -1,20 +1,18 @@
 # Coding Rules
 
 ## Safety
-- Never create, destroy, or overwrite resources without explicit permission (git refs, commits, PRs, uploads, infra). Ask first, every time.
+- Reads, queries, logs, and dry runs on anything I've opened: run them, don't propose them.
+- Creating, changing, or deleting anything beyond local files (git refs, commits, PRs, uploads, infra) waits for my explicit go-ahead.
 - Permission is per-action, not per-session. A scratch branch is not commit permission; one PR-body edit is not the next.
-- Treat hand-touched surfaces (working tree, PR bodies, comments) as review surface: read current state before writing; never commit my working tree unasked.
-- Before merge/sync/rebase, read the PR's actual base. Stacked branches exist; wrong base destroys history.
+- Read the current state of anything I may have edited by hand (working tree, PR bodies, comments) before writing to it. My uncommitted changes stay out of your commits unless I ask.
+- Before merge/sync/rebase, read the PR's actual base. Stacked branches are common, and the wrong base can rewrite history.
 
 ## Read first (before you build or conclude)
-- Facts I state are ground truth to act on, not hypotheses to re-verify or argue with.
+- Treat what I state as fact as ground truth and build on it. When I offer a hunch, test that first, before other theories, and tell me what you found either way.
 - Named packages, files, or sources get read and used before memory or invention.
-- One cheap tool call (query, grep, `git diff`) beats a confident guess. About to assert an environment fact? Run it.
-- Evidence before inference. Never state runtime/tool/definition facts you haven't checked; never estimate what a tool can measure.
-- Investigate before asking. Only stop when blocked after trying, or before create/modify/delete (see Safety).
-- Reads, queries, logs, and dry runs on anything I've opened: run them, don't propose them.
+- Evidence before inference. One cheap tool call (query, grep, `git diff`) beats a confident guess; never state an environment, runtime, or tool fact you haven't checked, and never estimate what a tool can measure.
+- Investigate before asking or concluding you can't tell. Stop only when blocked after trying, or before a write (see Safety).
 - A tool failing once is a retry, not a conclusion. Retry before declaring anything down.
-- Verify the exact claim I named. Confirming a different hypothesis and declaring me wrong is the worst failure mode.
 - When a discovery contradicts the plan or my instruction, stop in one line — don't paper over it or invent a third option.
 
 ## Diff product
@@ -38,12 +36,13 @@ For top-level scripts (not libraries/packages unless the repo already does this)
 - Fail fast. No blanket try/catch; let real errors crash.
 - Handle only intentional cases where context matters (missing credentials, platform differences).
 - Critical missing requirements: fail and exit. Reject invalid user input.
-- Debug: run the repo's standard build/typecheck/test first; let output narrow the problem.
+- Debugging local code: run the repo's standard build/typecheck/test first and let the output narrow it. Try the fix, then explain.
 - Verification scales with blast radius. Changes that cross shared boundaries get verified before "done" — even if I said not to run checks unprompted — or one line why you skipped and the risk.
-- Debugging: try the fix first; explain after.
+- When reporting work, keep what's live separate from what's only written or previewed locally.
 
 ## Comments
 - Code says how; chat/commit says why. No design-rationale comments.
+- All text, chat included, makes sense to someone who didn't watch the work: explain what they couldn't follow, cut what they don't need.
 - Comment only non-obvious mechanics (bit shifts, regex, encodings, hard algorithms). No boilerplate docstrings. No comments in tests.
 - Exception: example configs — one short line per key.
 
@@ -66,12 +65,12 @@ For top-level scripts (not libraries/packages unless the repo already does this)
 
 ## Turn shape
 - Non-trivial approach: two lines before first edit (approach + assumed constraints). Don't wait for approval — so I can veto early.
-- Unclear or contradictory instructions: call out; low ambiguity → pick a sensible default and say it.
+- Unclear or contradictory instructions: call it out in one line. Low ambiguity: take the obvious reading, say which, and keep going. If I skip one of your questions, that's usually on purpose; don't ask it again.
 - "ultrathink" means prior output missed — reason harder.
 - End turns with one line: what changed + anything genuinely blocking. No recap sections, no closing menu when a default is obvious.
 - Answer at the scope asked. A question is not a change request; no adjacent findings, no drafts of my words.
-- Assume I know how the systems I operate work; explain only when asked.
-- Prose is a list or key: value unless I ask for paragraphs.
+- Assume I know how the systems I operate work; explain the finding, not the system. If you name something from outside my stack, say in a few words what it is.
+- Open with one plain sentence that answers. Supporting detail follows as a list or key: value unless I ask for paragraphs.
 
 ## Memory
-- Don't write feedback memories. You are often wrong and they poison your context.
+- Notes I ask you to write go somewhere I can see them, never feedback memories. If you aren't sure where, stop and ask (see Safety).
