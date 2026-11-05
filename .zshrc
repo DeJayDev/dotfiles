@@ -32,6 +32,7 @@ plugins=(
   gradle-completion
   zsh-autosuggestions
   aws
+  kubectl
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -60,6 +61,9 @@ export PATH=$PATH:/opt/homebrew/opt/mysql-client/bin
 # opencode
 export PATH=$HOME/.opencode/bin:$PATH
 
+# krew
+export PATH="$HOME/.krew/bin:$PATH"
+
 # >>> grok installer >>>
 export PATH="$HOME/.grok/bin:$PATH"
 fpath=(~/.grok/completions/zsh $fpath)
@@ -74,4 +78,6 @@ esac
 # pnpm end
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# bun completions: loaded via $ZSH_CUSTOM/bun.zsh
 

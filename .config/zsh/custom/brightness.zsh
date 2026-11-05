@@ -16,8 +16,8 @@ brightness() {
       return
     fi
 
-    # No display given: hit every DDC-capable one. m1ddc lists a "(null)" device that can't be driven.
-    m1ddc display list | grep -v '(null)' | sed -E 's/^\[([0-9]+)\].*/\1/' | while read -r d; do
+    # No display given: hit every DDC-capable one. m1ddc lists the built-in panel as "(null)" or "Unknown Display", which can't be driven.
+    m1ddc display list | grep -v -e '(null)' -e 'Unknown Display' | sed -E 's/^\[([0-9]+)\].*/\1/' | while read -r d; do
       m1ddc display "$d" set luminance "$level"
     done
     return
