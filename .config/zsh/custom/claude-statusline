@@ -1,186 +1,23 @@
 #!/usr/bin/env bash
 
-input=$(cat)
+eval "$(jq -r '@sh "
+MODEL_DISPLAY=\(.model.display_name)
+TOTAL_COST=\(.cost.total_cost_usd // 0)
+LINES_ADDED=\(.cost.total_lines_added // 0)
+LINES_REMOVED=\(.cost.total_lines_removed // 0)
+CTX_WINDOW_SIZE=\(.context_window.context_window_size // 0)
+TOKENS=\(.context_window.current_usage | if . then .input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens else 0 end)
+FIVE_H=\(.rate_limits.five_hour.used_percentage // "")
+WEEK=\(.rate_limits.seven_day.used_percentage // "")
+FIVE_H_RESETS=\(.rate_limits.five_hour.resets_at // "")
+WEEK_RESETS=\(.rate_limits.seven_day.resets_at // "")
+"')"
 
-MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name')
-TOTAL_COST=$(echo "$input" | jq -r '.cost.total_cost_usd')
+lines=()
+for part in "${BASH_SOURCE[0]}.d"/*.sh; do
+        source "$part"
+done
 
-TOTAL_COST=$(printf "%.2f" "$TOTAL_COST")
-LINES_ADDED=$(echo "$input" | jq -r '.cost.total_lines_added')
-LINES_REMOVED=$(echo "$input" | jq -r '.cost.total_lines_removed')
-lines_changed=$(echo "$input" | jq -r '.cost.total_lines_added + .cost.total_lines_removed')
-CTX_WINDOW_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size')
-
-FIVE_H=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
-WEEK=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
-FIVE_H_RESETS=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
-WEEK_RESETS=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
-
-usage=$(echo "$input" | jq -r '.context_window.current_usage // empty')
-
-GREY='\033[90m'
-WHITE='\033[97m'
-GREEN='\033[32m'
-RED='\033[31m'
-YELLOW='\033[33m'
-BLUE='\033[94m'
-# Desaturated "muted" bar colors. Truecolor lets us dial in dimmed hues; on
-# terminals without 24-bit support fall back to the nearest 256-color shades.
-if [ "$COLORTERM" = "truecolor" ] || [ "$COLORTERM" = "24bit" ]; then
-        GREEN_MUTED='\033[38;2;68;88;70m'
-        GREEN_MUTED_BG='\033[48;2;68;88;70m'
-        RED_MUTED='\033[38;2;92;68;68m'
-        RED_MUTED_BG='\033[48;2;92;68;68m'
-        YELLOW_MUTED='\033[38;2;90;84;56m'
-        YELLOW_MUTED_BG='\033[48;2;90;84;56m'
-        MARKER='\033[38;2;96;184;180m'
-else
-        GREEN_MUTED='\033[38;5;65m'
-        GREEN_MUTED_BG='\033[48;5;65m'
-        RED_MUTED='\033[38;5;95m'
-        RED_MUTED_BG='\033[48;5;95m'
-        YELLOW_MUTED='\033[38;5;101m'
-        YELLOW_MUTED_BG='\033[48;5;101m'
-        MARKER='\033[38;5;73m'
-fi
-MARKER="$WHITE" # local override: solid white time-marker instead of peer's teal
-DARK='\033[38;5;238m' # local: dark track behind the grey 5h/7d fill
-GREY_BG='\033[100m'
-NC='\033[0m' # No Color
-
-# Vertical fill glyphs, level 0 (empty) .. 8 (full)
-BAR_GLYPHS=(' ' '▁' '▂' '▃' '▄' '▅' '▆' '▇' '█')
-
-# render_bar PCT FILL_FG MUTED_FG MUTED_BG [TIME_POS]
-# Renders a 10-cell bar with sub-cell resolution via vertical glyphs. The
-# partial cell draws its glyph (fill color) over the muted background so it
-# appears to fill up. If TIME_POS is given, that cell is drawn blue and fills
-# up in blue where the usage overlaps it.
-render_bar() {
-        local pct=${1%.*}
-        local fill_fg=$2 muted_fg=$3 muted_bg=$4 time_pos=${5:-}
-        local total i level bar=""
-
-        total=$(((pct * 80 + 50) / 100))
-        [ "$total" -lt 0 ] && total=0
-        [ "$total" -gt 80 ] && total=80
-
-        for i in $(seq 0 9); do
-                level=$((total - i * 8))
-                [ "$level" -lt 0 ] && level=0
-                [ "$level" -gt 8 ] && level=8
-
-                if [ -n "$time_pos" ] && [ "$i" -eq "$time_pos" ]; then
-                        bar="${bar}${MARKER}█${NC}"
-                elif [ "$level" -ge 4 ]; then
-                        bar="${bar}${fill_fg}█${NC}"
-                else
-                        bar="${bar}${muted_fg}█${NC}"
-                fi
-        done
-        echo -e "$bar"
-}
-
-display="[$MODEL_DISPLAY]"
-
-if [ -n "$usage" ]; then
-        tokens=$(echo "$usage" | jq ".input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens")
-else
-        tokens=0
-fi
-if [[ "$CTX_WINDOW_SIZE" =~ ^[0-9]+$ ]] && [ "$CTX_WINDOW_SIZE" -gt 0 ]; then
-        pct=$((tokens * 100 / CTX_WINDOW_SIZE))
-else
-        pct=0
-fi
-
-if [ "$pct" -ge 90 ]; then
-        BAR_COLOR="$RED"
-        BAR_COLOR_MUTED="$RED_MUTED"
-        BAR_COLOR_MUTED_BG="$RED_MUTED_BG"
-elif [ "$pct" -ge 75 ]; then
-        BAR_COLOR="$YELLOW"
-        BAR_COLOR_MUTED="$YELLOW_MUTED"
-        BAR_COLOR_MUTED_BG="$YELLOW_MUTED_BG"
-else
-        BAR_COLOR="$GREEN"
-        BAR_COLOR_MUTED="$GREEN_MUTED"
-        BAR_COLOR_MUTED_BG="$GREEN_MUTED_BG"
-fi
-
-BAR=$(render_bar "$pct" "$BAR_COLOR" "$BAR_COLOR_MUTED" "$BAR_COLOR_MUTED_BG")
-
-display="${display} ${BAR} ${WHITE}${pct%.*}%${NC} ($tokens/$CTX_WINDOW_SIZE)\n${GREY}\$${TOTAL_COST}${NC}"
-
-if [ "$lines_changed" -gt 0 ]; then
-        display="${display} ${GREEN}+${LINES_ADDED}${NC} ${RED}-${LINES_REMOVED}${NC}"
-fi
-
-echo -e "$display${NC}"
-
-# Show 5 hour and weekly cost as a bar
-
-make_bar() {
-        local pct=$1
-        local resets_at=$2
-        local window_secs=$3
-        local time_pos=""
-
-        if [ -n "$resets_at" ] && [ "$resets_at" != "null" ] && [ -n "$window_secs" ]; then
-                local now_ts elapsed_secs
-                now_ts=$(date +%s)
-                elapsed_secs=$((resets_at - now_ts))
-                time_pos=$(((window_secs - elapsed_secs) * 10 / window_secs))
-                [ "$time_pos" -lt 0 ] && time_pos=0
-                [ "$time_pos" -gt 9 ] && time_pos=9
-        fi
-
-        render_bar "$pct" "$GREY" "$DARK" "$GREY_BG" "$time_pos"
-}
-
-format_reset() {
-        local resets_at=$1
-        if [ -z "$resets_at" ] || [ "$resets_at" = "null" ]; then
-                echo ""
-                return
-        fi
-        local now_ts remaining days hours mins
-        now_ts=$(date +%s)
-        remaining=$((resets_at - now_ts))
-        [ "$remaining" -lt 0 ] && remaining=0
-        days=$((remaining / 86400))
-        hours=$(((remaining % 86400) / 3600))
-        mins=$(((remaining % 3600) / 60))
-        if [ "$days" -gt 0 ]; then
-                echo "${days}d${hours}h"
-        elif [ "$hours" -gt 0 ]; then
-                echo "${hours}h${mins}m"
-        else
-                echo "${mins}m"
-        fi
-}
-
-FIVE_H_SEG=""
-WEEK_SEG=""
-
-if [ -n "$FIVE_H" ]; then
-        FIVE_H_BAR=$(make_bar "$FIVE_H" "$FIVE_H_RESETS" $((5 * 3600)))
-        FIVE_H_RESET=$(format_reset "$FIVE_H_RESETS")
-        FIVE_H_SEG="${GREY}5h: ${FIVE_H%.*}% ${NC}${FIVE_H_BAR}${NC}"
-        [ -n "$FIVE_H_RESET" ] && FIVE_H_SEG="${FIVE_H_SEG}${GREY} (${BLUE}${FIVE_H_RESET}${NC}${GREY})${NC}"
-fi
-
-if [ -n "$WEEK" ]; then
-        WEEK_BAR=$(make_bar "$WEEK" "$WEEK_RESETS" $((7 * 24 * 3600)))
-        WEEK_RESET=$(format_reset "$WEEK_RESETS")
-        WEEK_SEG="${GREY}7d: ${WEEK%.*}% ${NC}${WEEK_BAR}${NC}"
-        [ -n "$WEEK_RESET" ] && WEEK_SEG="${WEEK_SEG}${GREY} (${BLUE}${WEEK_RESET}${NC}${GREY})${NC}"
-fi
-
-if [ -n "$FIVE_H_SEG" ] && [ -n "$WEEK_SEG" ]; then
-        echo -e "${FIVE_H_SEG} | ${WEEK_SEG}"
-elif [ -n "$FIVE_H_SEG" ]; then
-        echo -e "$FIVE_H_SEG"
-elif [ -n "$WEEK_SEG" ]; then
-        echo -e "$WEEK_SEG"
-fi
+for line in "${lines[@]}"; do
+        echo -e "$line"
+done
