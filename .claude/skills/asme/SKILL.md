@@ -18,7 +18,8 @@ match them over anything below:
 
 - PR body: `gh pr list --author @me --state merged --limit 5 --json body`.
 - Commit message or branch name: `git log --author="$(git config user.email)" -10 --format=%s`.
-  Conventional commits when that is what's there.
+  Conventional commits when that is what's there. A commit is the subject
+  line only, never a body, even when older commits in the repo have one.
 - Reply in a thread: the whole thread, including the user's earlier messages in it.
 - Status page or any post in a series: the earlier posts. They set the length
   and the detail.
@@ -34,6 +35,7 @@ the wording to dodge it.
 
 Cover the whole change. Every change in the diff gets a line, and unrelated
 ones go in an `Also,` list; never hand them back to the user to split out.
+A commit is the exception: its one subject line names the change as a whole.
 
 Then reread it as someone who only has this text. Anything they couldn't
 follow gets explained or goes; anything they don't need goes.
